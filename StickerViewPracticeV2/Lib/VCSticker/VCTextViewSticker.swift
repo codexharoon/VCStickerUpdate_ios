@@ -8,72 +8,100 @@
 import UIKit
 
 public class VCTextViewSticker: VCBaseSticker {
-    
-    // MARK: - Public Properties
-    
+
+    // MARK: - Public Styling Properties
+    // ----------------------------------------------------------
+
+    @objc public var stickerTextColor: UIColor = .black {
+        didSet { applyTextAttributes() }
+    }
+
+    @objc public var stickerOpacity: CGFloat = 1.0 {
+        didSet { self.alpha = min(max(stickerOpacity, 0), 1) }
+    }
+
+    @objc public var stickerFontName: String = UIFont.systemFont(ofSize: 24).fontName {
+        didSet { applyTextAttributes() }
+    }
+
+    @objc public var stickerIsBold: Bool = false {
+        didSet { applyTextAttributes() }
+    }
+
+    @objc public var stickerIsItalic: Bool = false {
+        didSet { applyTextAttributes() }
+    }
+
+    @objc public var stickerAlignment: NSTextAlignment = .center {
+        didSet { applyTextAttributes() }
+    }
+
+    @objc public var lineSpacing: CGFloat = 0 {
+        didSet { applyTextAttributes() }
+    }
+
+    @objc public var letterSpacing: CGFloat = 0 {
+        didSet { applyTextAttributes() }
+    }
+
+    // SHADOW PROPERTIES
+    @objc public var stickerShadowColor: UIColor = .black {
+        didSet { applyShadow() }
+    }
+
+    @objc public var stickerShadowOffset: CGSize = CGSize(width: 0, height: 5) {
+        didSet { applyShadow() }
+    }
+
+    @objc public var stickerShadowOpacity: Float = 1.0 {
+        didSet { applyShadow() }
+    }
+
+    @objc public var stickerShadowRadius: CGFloat = 4 {
+        didSet { applyShadow() }
+    }
+
+    // Required for backward compatibility
     @objc public var shadowEnable: Bool = false {
         didSet {
-            self.textView.layer.shadowColor = shadowColor
+            stickerShadowOpacity = shadowEnable ? 1 : 0
+            applyShadow()
         }
     }
-    
-    @objc public var textColor = UIColor.black {
-        didSet {
-            updateTextDisplay()
-        }
-    }
-    
+
+    // MARK: - Original Properties
+    // ----------------------------------------------------------
+
     @objc public var text: String? {
         didSet {
             guard let newText = text, !newText.isEmpty else { return }
             setupInitialLayout()
         }
     }
-    
-    @objc private var shadowColor: CGColor {
-        return self.shadowEnable ? UIColor.black.cgColor : UIColor.clear.cgColor
-    }
-    
-    // MARK: - Private Properties
-    
-    /// The reference font size when text is first set
+
     private var referenceFontSize: CGFloat = 24
-    
-    /// The reference bounds when text layout is established
     private var referenceBounds: CGSize = .zero
-    
-    /// Flag to track if initial layout has been established
     private var isLayoutEstablished: Bool = false
-    
-    // MARK: - UI Components
-    
+
+    // MARK: - UI Component
+    // ----------------------------------------------------------
+
     public lazy var textView: UITextView = {
-        let textView = UITextView()
-        
-        textView.isEditable = false
-        textView.isSelectable = false
-        textView.isScrollEnabled = false
-        textView.backgroundColor = .clear
-        textView.textContainerInset = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4)
-        textView.textContainer.lineFragmentPadding = 0
-        textView.textContainer.lineBreakMode = .byWordWrapping
-        
-        textView.tintColor = self.textColor
-        textView.textColor = self.textColor
-        textView.textAlignment = .center
-        textView.font = UIFont.systemFont(ofSize: 24)
-        
-        // Shadow configuration
-        textView.layer.shadowColor = shadowColor
-        textView.layer.shadowOffset = CGSize(width: 0, height: 5)
-        textView.layer.shadowOpacity = 1.0
-        textView.layer.shadowRadius = 4.0
-        
-        return textView
+        let tv = UITextView()
+        tv.isEditable = false
+        tv.isSelectable = false
+        tv.isScrollEnabled = false
+        tv.backgroundColor = .clear
+        tv.textContainerInset = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4)
+        tv.textContainer.lineFragmentPadding = 0
+        tv.textAlignment = .center
+        tv.font = UIFont.systemFont(ofSize: referenceFontSize)
+        return tv
     }()
-    
+
     // MARK: - Initialization
-    
+    // ----------------------------------------------------------
+
     @objc public init(center: CGPoint, text: String = "") {
         let frame = CGRect(
             x: center.x - kMinFrameWidth / 2,
@@ -84,86 +112,133 @@ public class VCTextViewSticker: VCBaseSticker {
         super.init(frame: frame)
         self.text = text
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-    
-    // MARK: - Lifecycle
-    
-    @objc override open func customInit() {
+
+    override open func customInit() {
         super.customInit()
-        self.contentView.addSubview(textView)
+        contentView.addSubview(textView)
         textView.edgesToSuperview(0)
-        
+
         if let text = self.text, !text.isEmpty {
             setupInitialLayout()
         }
+
+        applyShadow()
     }
-    
-    @objc override public func finishEditing() {
-        super.finishEditing()
+
+    // MARK: - FONT BUILDER
+    // ----------------------------------------------------------
+
+    private func buildFont(pointSize: CGFloat) -> UIFont {
+        var font = UIFont(name: stickerFontName, size: pointSize)
+            ?? UIFont.systemFont(ofSize: pointSize)
+
+        var traits: UIFontDescriptor.SymbolicTraits = []
+
+        if stickerIsBold { traits.insert(.traitBold) }
+        if stickerIsItalic { traits.insert(.traitItalic) }
+
+        if let descriptor = font.fontDescriptor.withSymbolicTraits(traits) {
+            font = UIFont(descriptor: descriptor, size: pointSize)
+        }
+
+        return font
     }
-    
-    // MARK: - Core Layout System
-    
-    /// Establishes the initial text layout and reference dimensions
+
+    // MARK: - TEXT ATTRIBUTES
+    // ----------------------------------------------------------
+
+    private func applyTextAttributes() {
+        guard let text = self.text else { return }
+
+        let currentFontSize = textView.font?.pointSize ?? referenceFontSize
+        let font = buildFont(pointSize: currentFontSize)
+
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = stickerAlignment
+        paragraph.lineSpacing = lineSpacing
+
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .foregroundColor: stickerTextColor,
+            .paragraphStyle: paragraph,
+            .kern: letterSpacing
+        ]
+
+        textView.attributedText = NSAttributedString(string: text, attributes: attributes)
+    }
+
+    // MARK: - SHADOW HANDLING
+    // ----------------------------------------------------------
+
+    private func applyShadow() {
+
+        if shadowEnable == false {
+            textView.layer.shadowOpacity = 0   // fully disable shadow
+            return
+        }
+
+        // Apply actual shadow settings
+        textView.layer.shadowColor = stickerShadowColor.cgColor
+        textView.layer.shadowOffset = stickerShadowOffset
+        textView.layer.shadowOpacity = stickerShadowOpacity
+        textView.layer.shadowRadius = stickerShadowRadius
+    }
+
+
+    // MARK: - CORE LAYOUT (Your Existing Logic)
+    // ----------------------------------------------------------
+
     private func setupInitialLayout() {
-        guard let text = self.text, !text.isEmpty else { return }
-        
-        let font = UIFont.systemFont(ofSize: referenceFontSize)
-        
-        // Calculate natural text dimensions without wrapping constraints
+        guard let text = self.text else { return }
+
+        let font = buildFont(pointSize: referenceFontSize)
+
         let textSize = calculateTextSize(text: text, font: font, maxWidth: CGFloat.greatestFiniteMagnitude)
-        
-        // Set initial bounds based on natural text size
-        let idealWidth = textSize.width + 2 * self.padding + 16
-        let idealHeight = textSize.height + 2 * self.padding + 16
-        
-        let width = max(min(idealWidth, 400), kMinFrameWidth)
-        let height = max(idealHeight, kMinFrameHeight)
-        
-        self.bounds.size = CGSize(width: width, height: height)
-        
-        // Store reference dimensions
+
+        let idealWidth = textSize.width + 2 * padding + 16
+        let idealHeight = textSize.height + 2 * padding + 16
+
+        self.bounds.size = CGSize(
+            width: max(min(idealWidth, 400), kMinFrameWidth),
+            height: max(idealHeight, kMinFrameHeight)
+        )
+
         referenceBounds = self.bounds.size
         isLayoutEstablished = true
-        
-        // Apply initial text styling
         updateTextDisplay()
     }
-    
-    /// Updates the text display with proper scaling based on current bounds
+
     private func updateTextDisplay() {
-        guard let text = self.text, !text.isEmpty else { return }
-        
-        // Compute scale factor based purely on sticker resize
-        let widthScale = self.bounds.width / referenceBounds.width
-        let heightScale = self.bounds.height / referenceBounds.height
+        guard let text = self.text else { return }
+
+        let widthScale = bounds.width / referenceBounds.width
+        let heightScale = bounds.height / referenceBounds.height
         let scaleFactor = min(widthScale, heightScale)
-        
-        // Apply scaled font size
+
         var fontSize = referenceFontSize * scaleFactor
-        fontSize = max(14, min(fontSize, 200))   // Safe limits
-        
-        let font = UIFont.systemFont(ofSize: fontSize)
-        
-        // Prepare paragraph style
+        fontSize = max(10, min(fontSize, 200))
+
+        let font = buildFont(pointSize: fontSize)
+
         let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-        paragraph.lineBreakMode = .byWordWrapping
-        
-        // Apply attributed string
+        paragraph.alignment = stickerAlignment
+
         let attributes: [NSAttributedString.Key : Any] = [
             .font: font,
-            .foregroundColor: textColor,
-            .paragraphStyle: paragraph
+            .foregroundColor: stickerTextColor,
+            .paragraphStyle: paragraph,
+            .kern: letterSpacing
         ]
-        
+
         textView.attributedText = NSAttributedString(string: text, attributes: attributes)
-        
-        // Prevent overflow – shrink font until text fits
+
         fitTextToBounds(font: font)
+
+        applyShadow()
     }
 
     private func fitTextToBounds(font: UIFont) {
@@ -176,99 +251,74 @@ public class VCTextViewSticker: VCBaseSticker {
         var size = measure(text: text, font: currentFont, width: maxWidth)
 
         while size.height > maxHeight && currentFont.pointSize > 10 {
-            currentFont = UIFont.systemFont(ofSize: currentFont.pointSize - 1)
+            currentFont = buildFont(pointSize: currentFont.pointSize - 1)
             size = measure(text: text, font: currentFont, width: maxWidth)
         }
 
         textView.font = currentFont
+        applyTextAttributes()
     }
 
-    
     private func measure(text: String, font: UIFont, width: CGFloat) -> CGSize {
         let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
+        paragraph.alignment = stickerAlignment
 
         let attr: [NSAttributedString.Key : Any] = [
             .font: font,
-            .paragraphStyle: paragraph
+            .paragraphStyle: paragraph,
+            .kern: letterSpacing
         ]
 
-        let rect = (text as NSString).boundingRect(
+        return (text as NSString).boundingRect(
             with: CGSize(width: width, height: .greatestFiniteMagnitude),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
             attributes: attr,
             context: nil
-        )
-        
-        return rect.size
+        ).size
     }
-    
-    /// Calculate text size for given parameters
+
     private func calculateTextSize(text: String, font: UIFont, maxWidth: CGFloat) -> CGSize {
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
-        paragraphStyle.lineSpacing = 0
-        paragraphStyle.lineHeightMultiple = 1.0
-        
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .paragraphStyle: paragraphStyle
-        ]
-        
-        let size = (text as NSString).boundingRect(
+        paragraphStyle.alignment = stickerAlignment
+
+        return (text as NSString).boundingRect(
             with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: attributes,
+            attributes: [.font: font, .paragraphStyle: paragraphStyle],
             context: nil
         ).size
-        
-        return size
     }
-    
-    /// Calculate true minimum bounds required to keep text readable at minimum font size.
+
     private func calculateMinimumBounds() -> CGSize {
-        guard let text = self.text, !text.isEmpty else {
+        guard let text = self.text else {
             return CGSize(width: kMinFrameWidth, height: kMinFrameHeight)
         }
 
-        let minimumFontSize: CGFloat = 10     // You may adjust
-        let font = UIFont.systemFont(ofSize: minimumFontSize)
-
-        // Measure text using minimum readable font size
-        let minTextSize = measure(text: text, font: font, width: CGFloat.greatestFiniteMagnitude)
-
-        let requiredWidth = minTextSize.width + (padding * 2) + 16
-        let requiredHeight = minTextSize.height + (padding * 2) + 16
+        let minFont = buildFont(pointSize: 10)
+        let minSize = measure(text: text, font: minFont, width: CGFloat.greatestFiniteMagnitude)
 
         return CGSize(
-            width: max(requiredWidth, kMinFrameWidth),
-            height: max(requiredHeight, kMinFrameHeight)
+            width: max(minSize.width + padding * 2 + 16, kMinFrameWidth),
+            height: max(minSize.height + padding * 2 + 16, kMinFrameHeight)
         )
     }
-
 }
 
 // MARK: - Gesture Overrides
+// ----------------------------------------------------------
 
 extension VCTextViewSticker {
-    
-    override func handlePanGesture(gesture: UIPanGestureRecognizer) {
-        super.handlePanGesture(gesture: gesture)
-    }
-    
+
     override func handleResize(gesture: UIPanGestureRecognizer) {
 
         if gesture.state == .began && !isLayoutEstablished {
             setupInitialLayout()
         }
 
-        // Perform normal resize first
         super.handleResize(gesture: gesture)
 
-        // Get the true minimum bounds
         let minBounds = calculateMinimumBounds()
 
-        // Prevent sticker from shrinking below minimum text size
         if bounds.width < minBounds.width || bounds.height < minBounds.height {
             bounds.size = CGSize(
                 width: max(bounds.width, minBounds.width),
@@ -276,14 +326,8 @@ extension VCTextViewSticker {
             )
         }
 
-        // Update text during resize
         if gesture.state == .changed || gesture.state == .ended {
             updateTextDisplay()
         }
-    }
-
-    
-    override func handleRotate(gesture: UIPanGestureRecognizer) {
-        super.handleRotate(gesture: gesture)
     }
 }
