@@ -27,7 +27,7 @@ class ViewController: UIViewController {
         image.imageView.image = UIImage(named: "ImageScannerIcon")
         stickerView.addSubview(image)
         
-        let label = VCLabelSticker(center: self.view.center)
+        let label = VCTextViewSticker(center: self.view.center)
         label.borderStyle = .dotted
         label.borderColor = .systemTeal
         label.text = "Haroon. this is large text \n testing is the process \n testing is testing Haroon. this is large text \n testing is the process \n testing is testing"

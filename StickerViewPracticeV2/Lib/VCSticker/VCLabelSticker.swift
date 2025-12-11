@@ -5,31 +5,43 @@
 //  Created by Vincent on 2019/11/13.
 //  Copyright © 2019 Vincent. All rights reserved.
 //
-//  Updated by haroon on 11/12/2025.
+//  updated by haroon on 11/12/2025.
 //
 
 import UIKit
 
 public class VCLabelSticker: VCBaseSticker {
     
-    // MARK: - Public Properties
-    
-    @objc public var shadowEnable: Bool = false {
+    @objc public var shadowEnable: Bool = false {                // 是否显示文字阴影
         didSet {
-            self.textView.layer.shadowColor = shadowColor
+            self.textField.layer.shadowColor = shadowColor
         }
     }
-    
-    @objc public var textColor = UIColor.black {
+    @objc public var placeHolder = "type something..." {                  // 占位字符
         didSet {
-            updateTextDisplay()
+            self.textField.placeholder = placeHolder
         }
     }
-    
-    @objc public var text: String? {
+    @objc public var fontSize: CGFloat {          // 字体大小
+        set {
+            self.textField.font = self.textField.font?.withSize(newValue)
+        }
+        
+        get {
+            return self.textField.font?.pointSize ?? UIFont.systemFontSize
+        }
+    }
+    @objc public var textColor   = UIColor.black {               // 文字颜色
         didSet {
-            guard let newText = text, !newText.isEmpty else { return }
-            setupInitialLayout()
+            self.textField.textColor = textColor
+        }
+    }
+    @objc public var text: String? {                              // 文本内容
+        set {
+            self.textField.text = newValue
+        }
+        get {
+            return self.textField.text
         }
     }
     
@@ -37,256 +49,88 @@ public class VCLabelSticker: VCBaseSticker {
         return self.shadowEnable ? UIColor.black.cgColor : UIColor.clear.cgColor
     }
     
-    // MARK: - Private Properties
-    
-    /// The reference font size when text is first set
-    private var referenceFontSize: CGFloat = 24
-    
-    /// The reference bounds when text layout is established
-    private var referenceBounds: CGSize = .zero
-    
-    /// Flag to track if initial layout has been established
-    private var isLayoutEstablished: Bool = false
-    
-    // MARK: - UI Components
-    
-    public lazy var textView: UITextView = {
-        let textView = UITextView()
+    public lazy var textField: UITextField = {     // 文字输入框
+        let textField = UITextField()
         
-        textView.isEditable = false
-        textView.isSelectable = false
-        textView.isScrollEnabled = false
-        textView.backgroundColor = .clear
-        textView.textContainerInset = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4)
-        textView.textContainer.lineFragmentPadding = 0
-        textView.textContainer.lineBreakMode = .byWordWrapping
+        textField.delegate  = self
+        textField.tintColor = self.textColor        // 光标颜色
+        textField.textColor = self.textColor        // 文字颜色
         
-        textView.tintColor = self.textColor
-        textView.textColor = self.textColor
-        textView.textAlignment = .center
-        textView.font = UIFont.systemFont(ofSize: 24)
+        textField.attributedPlaceholder = NSAttributedString(string:self.placeHolder,
+                                                             attributes: [.foregroundColor: UIColor.gray])
+        textField.textAlignment = .center
         
-        // Shadow configuration
-        textView.layer.shadowColor = shadowColor
-        textView.layer.shadowOffset = CGSize(width: 0, height: 5)
-        textView.layer.shadowOpacity = 1.0
-        textView.layer.shadowRadius = 4.0
+        // 设置阴影
+        textField.layer.shadowColor   = shadowColor
+        textField.layer.shadowOffset  = CGSize(width: 0, height: 5)
+        textField.layer.shadowOpacity = 1.0
+        textField.layer.shadowRadius  = 4.0
         
-        return textView
+        textField.addTarget(self, action: #selector(textFieldValueDidChanged), for: .editingChanged)
+        
+        return textField
     }()
     
-    // MARK: - Initialization
-    
-    @objc public init(center: CGPoint, text: String = "") {
-        let frame = CGRect(
-            x: center.x - kMinFrameWidth / 2,
-            y: center.y - kMinFrameWidth / 2,
-            width: kMinFrameWidth,
-            height: kMinFrameWidth
-        )
+    @objc public init(center: CGPoint) {
+        let frame = CGRect(x: center.x - kMinFrameWidth / 2, y: center.y - kMinFrameWidth / 2, width: kMinFrameWidth, height: kMinFrameWidth)
         super.init(frame: frame)
-        self.text = text
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
     
-    // MARK: - Lifecycle
-    
+    // mark - 重写父类的方法
     @objc override open func customInit() {
         super.customInit()
-        self.contentView.addSubview(textView)
-        textView.edgesToSuperview(0)
-        
-        if let text = self.text, !text.isEmpty {
-            setupInitialLayout()
-        }
+        self.contentView.addSubview(textField)
+        textField.edgesToSuperview(0)
+        adjustFrameWithContent()
     }
     
     @objc override public func finishEditing() {
         super.finishEditing()
+        textField.resignFirstResponder()
     }
-    
-    // MARK: - Core Layout System
-    
-    /// Establishes the initial text layout and reference dimensions
-    private func setupInitialLayout() {
-        guard let text = self.text, !text.isEmpty else { return }
-        
-        let font = UIFont.systemFont(ofSize: referenceFontSize)
-        
-        // Calculate natural text dimensions without wrapping constraints
-        let textSize = calculateTextSize(text: text, font: font, maxWidth: CGFloat.greatestFiniteMagnitude)
-        
-        // Set initial bounds based on natural text size
-        let idealWidth = textSize.width + 2 * self.padding + 16
-        let idealHeight = textSize.height + 2 * self.padding + 16
-        
-        let width = max(min(idealWidth, 400), kMinFrameWidth)
-        let height = max(idealHeight, kMinFrameHeight)
-        
-        self.bounds.size = CGSize(width: width, height: height)
-        
-        // Store reference dimensions
-        referenceBounds = self.bounds.size
-        isLayoutEstablished = true
-        
-        // Apply initial text styling
-        updateTextDisplay()
-    }
-    
-    /// Updates the text display with proper scaling based on current bounds
-    private func updateTextDisplay() {
-        guard let text = self.text, !text.isEmpty else { return }
-        
-        // Compute scale factor based purely on sticker resize
-        let widthScale = self.bounds.width / referenceBounds.width
-        let heightScale = self.bounds.height / referenceBounds.height
-        let scaleFactor = min(widthScale, heightScale)
-        
-        // Apply scaled font size
-        var fontSize = referenceFontSize * scaleFactor
-        fontSize = max(14, min(fontSize, 200))   // Safe limits
-        
-        let font = UIFont.systemFont(ofSize: fontSize)
-        
-        // Prepare paragraph style
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-        paragraph.lineBreakMode = .byWordWrapping
-        
-        // Apply attributed string
-        let attributes: [NSAttributedString.Key : Any] = [
-            .font: font,
-            .foregroundColor: textColor,
-            .paragraphStyle: paragraph
-        ]
-        
-        textView.attributedText = NSAttributedString(string: text, attributes: attributes)
-        
-        // Prevent overflow – shrink font until text fits
-        fitTextToBounds(font: font)
-    }
-
-    private func fitTextToBounds(font: UIFont) {
-        guard let text = text else { return }
-
-        let maxWidth = bounds.width - 2 * padding - 8
-        let maxHeight = bounds.height - 2 * padding - 8
-
-        var currentFont = font
-        var size = measure(text: text, font: currentFont, width: maxWidth)
-
-        while size.height > maxHeight && currentFont.pointSize > 10 {
-            currentFont = UIFont.systemFont(ofSize: currentFont.pointSize - 1)
-            size = measure(text: text, font: currentFont, width: maxWidth)
-        }
-
-        textView.font = currentFont
-    }
-
-    
-    private func measure(text: String, font: UIFont, width: CGFloat) -> CGSize {
-        let paragraph = NSMutableParagraphStyle()
-        paragraph.alignment = .center
-
-        let attr: [NSAttributedString.Key : Any] = [
-            .font: font,
-            .paragraphStyle: paragraph
-        ]
-
-        let rect = (text as NSString).boundingRect(
-            with: CGSize(width: width, height: .greatestFiniteMagnitude),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: attr,
-            context: nil
-        )
-        
-        return rect.size
-    }
-    
-    /// Calculate text size for given parameters
-    private func calculateTextSize(text: String, font: UIFont, maxWidth: CGFloat) -> CGSize {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .center
-        paragraphStyle.lineSpacing = 0
-        paragraphStyle.lineHeightMultiple = 1.0
-        
-        let attributes: [NSAttributedString.Key: Any] = [
-            .font: font,
-            .paragraphStyle: paragraphStyle
-        ]
-        
-        let size = (text as NSString).boundingRect(
-            with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: attributes,
-            context: nil
-        ).size
-        
-        return size
-    }
-    
-    /// Calculate true minimum bounds required to keep text readable at minimum font size.
-    private func calculateMinimumBounds() -> CGSize {
-        guard let text = self.text, !text.isEmpty else {
-            return CGSize(width: kMinFrameWidth, height: kMinFrameHeight)
-        }
-
-        let minimumFontSize: CGFloat = 12     // You may adjust
-        let font = UIFont.systemFont(ofSize: minimumFontSize)
-
-        // Measure text using minimum readable font size
-        let minTextSize = measure(text: text, font: font, width: CGFloat.greatestFiniteMagnitude)
-
-        let requiredWidth = minTextSize.width + (padding * 2) + 16
-        let requiredHeight = minTextSize.height + (padding * 2) + 16
-
-        return CGSize(
-            width: max(requiredWidth, kMinFrameWidth),
-            height: max(requiredHeight, kMinFrameHeight)
-        )
-    }
-
 }
 
-// MARK: - Gesture Overrides
+extension VCLabelSticker: UITextFieldDelegate {
+    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if isEditing {
+            return true
+        }
+        beginEditing()
 
-extension VCLabelSticker {
+        return false
+    }
     
+    private func adjustFrameWithContent() {
+        let tfFrame = textField.adjustsWidthToFillContents()
+        self.bounds.size.width = tfFrame.width + 2*self.padding
+        self.bounds.size.height = tfFrame.height + 2*self.padding
+    }
+    
+    @objc private func textFieldValueDidChanged() {
+        adjustFrameWithContent()
+    }
+    
+    func adjustTextFieldFont() {
+        self.textField.adjustsFontSizeToFillRect(self.bounds.insetBy(dx: self.padding, dy: self.padding))
+    }
+}
+
+// 重写父类的方法
+extension VCLabelSticker {
+  
     override func handlePanGesture(gesture: UIPanGestureRecognizer) {
         super.handlePanGesture(gesture: gesture)
+        textField.resignFirstResponder()
     }
     
     override func handleResize(gesture: UIPanGestureRecognizer) {
-
-        if gesture.state == .began && !isLayoutEstablished {
-            setupInitialLayout()
-        }
-
-        // Perform normal resize first
         super.handleResize(gesture: gesture)
-
-        // Get the true minimum bounds
-        let minBounds = calculateMinimumBounds()
-
-        // Prevent sticker from shrinking below minimum text size
-        if bounds.width < minBounds.width || bounds.height < minBounds.height {
-            bounds.size = CGSize(
-                width: max(bounds.width, minBounds.width),
-                height: max(bounds.height, minBounds.height)
-            )
-        }
-
-        // Update text during resize
-        if gesture.state == .changed || gesture.state == .ended {
-            updateTextDisplay()
-        }
-    }
-
-    
-    override func handleRotate(gesture: UIPanGestureRecognizer) {
-        super.handleRotate(gesture: gesture)
+        
+        // 修改文字大小
+        adjustTextFieldFont()
     }
 }
