@@ -30,7 +30,8 @@ class ViewController: UIViewController {
         let label = VCLabelSticker(center: self.view.center)
         label.borderStyle = .dotted
         label.borderColor = .systemTeal
-        label.text = "Haroon"
+        label.text = "Haroon. this is large text \n testing is the process \n testing is testing Haroon. this is large text \n testing is the process \n testing is testing"
+//        label.fontSize = 24
         label.textColor = .label
         stickerView.addSubview(label)
     }
