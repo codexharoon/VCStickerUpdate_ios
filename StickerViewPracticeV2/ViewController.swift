@@ -12,8 +12,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 
     @IBOutlet weak var stickerView: UIView!
     
-    
-    var textStickers: [VCTextViewSticker] = []
+    var allStickers: [VCBaseSticker] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,11 +28,11 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         textViewEditVC.onDoneTap = { [weak self] text in
             guard let self = self else { return }
-            let _ = self.createTextSticker(text: text)
-//            let textSticker = self.createTextSticker(text: text)
-//            self.textStickers.append(textSticker)
-//            self.setupAllTextStickers()
             
+            let textSticker = self.createTextSticker(text: text)
+            self.allStickers.append(textSticker)
+            self.setupAllStickers()
+            textSticker.beginEditing()
         }
         
         self.present(textViewEditVC, animated: true)
@@ -60,6 +59,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         imageSticker.borderStyle = .dotted
         imageSticker.borderColor = .systemTeal
         imageSticker.imageView.image = UIImage(named: "ImageScannerIcon")
+        wireStickerCallbacks(imageSticker)
         stickerView.addSubview(imageSticker)
         
         let textSticker = VCTextViewSticker(center: self.view.center)
@@ -71,8 +71,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         textSticker.stickerFontName = "SF Mono"
         textSticker.stickerIsBold = true
         textSticker.stickerIsItalic = true
-//        textSticker.shadowEnable = true
-//        textSticker.stickerShadowOffset = CGSize(width: 0, height: 0)
+        wireStickerCallbacks(textSticker)
         stickerView.addSubview(textSticker)
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
@@ -120,24 +119,51 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         textSticker.isUserInteractionEnabled = true
         textSticker.addGestureRecognizer(gesture)
         
-        self.stickerView.addSubview(textSticker)
+        // Wire selection and close callbacks so selecting one finishes others
+        wireStickerCallbacks(textSticker)
         
         return textSticker
     }
     
     
-    func createImageSticker(image: UIImage){
+    func createImageSticker(image: UIImage) -> VCImageSticker {
         let imageSticker = VCImageSticker(frame: CGRect(x: stickerView.center.x - 75 , y: stickerView.center.y - 75, width: 150, height: 150))
         imageSticker.borderStyle = .dotted
         imageSticker.borderColor = .systemTeal
         imageSticker.imageView.image = image
-        stickerView.addSubview(imageSticker)
+        
+        // Wire selection and close callbacks so selecting one finishes others
+        wireStickerCallbacks(imageSticker)
+        
+        return imageSticker
     }
     
     
-    func setupAllTextStickers(){
-        for sticker in textStickers {
+    func setupAllStickers(){
+        // Ensure callbacks are wired for all, and add them to the view
+        for sticker in allStickers {
+            wireStickerCallbacks(sticker)
+            sticker.finishEditing()
             self.stickerView.addSubview(sticker)
+        }
+    }
+    
+    // MARK: - Centralized selection handling
+    private func wireStickerCallbacks(_ sticker: VCBaseSticker) {
+        sticker.onBeginEditing = { [weak self, weak sticker] in
+            guard let self = self, let selected = sticker else { return }
+            // Finish editing on all other stickers
+            for other in self.allStickers where other !== selected {
+                other.finishEditing()
+            }
+        }
+        
+        sticker.onClose = { [weak self, weak sticker] in
+            guard let self = self, let s = sticker else { return }
+            // Remove from our tracking array when closed
+            if let idx = self.allStickers.firstIndex(where: { $0 === s }) {
+                self.allStickers.remove(at: idx)
+            }
         }
     }
 
@@ -158,7 +184,11 @@ extension ViewController {
                     }
                     if let selectedImage = image as? UIImage{
                         DispatchQueue.main.async {
-                            self.createImageSticker(image: selectedImage)
+                            let sticker = self.createImageSticker(image: selectedImage)
+                            self.allStickers.append(sticker)
+                            
+                            self.setupAllStickers()
+                            sticker.beginEditing()
                         }
                     }
                 }
