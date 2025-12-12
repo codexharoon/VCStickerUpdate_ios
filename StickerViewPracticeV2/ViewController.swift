@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import PhotosUI
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, PHPickerViewControllerDelegate {
 
     @IBOutlet weak var stickerView: UIView!
     
@@ -36,6 +37,20 @@ class ViewController: UIViewController {
         }
         
         self.present(textViewEditVC, animated: true)
+    }
+    
+    
+    
+    @IBAction func addImageStickerAction(_ sender: Any) {
+        var pickerConfig = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
+        pickerConfig.filter = .images
+        pickerConfig.selectionLimit = 1
+        
+        let picker = PHPickerViewController(configuration: pickerConfig)
+        picker.delegate = self
+        picker.modalPresentationStyle = .fullScreen
+        
+        self.present(picker, animated: true)
     }
     
     
@@ -111,6 +126,15 @@ class ViewController: UIViewController {
     }
     
     
+    func createImageSticker(image: UIImage){
+        let imageSticker = VCImageSticker(frame: CGRect(x: stickerView.center.x - 75 , y: stickerView.center.y - 75, width: 150, height: 150))
+        imageSticker.borderStyle = .dotted
+        imageSticker.borderColor = .systemTeal
+        imageSticker.imageView.image = image
+        stickerView.addSubview(imageSticker)
+    }
+    
+    
     func setupAllTextStickers(){
         for sticker in textStickers {
             self.stickerView.addSubview(sticker)
@@ -118,5 +142,29 @@ class ViewController: UIViewController {
     }
 
 
+}
+
+
+
+extension ViewController {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        if let itemprovider = results.first?.itemProvider{
+          
+            if itemprovider.canLoadObject(ofClass: UIImage.self){
+                itemprovider.loadObject(ofClass: UIImage.self) { image , error  in
+                    if let error{
+                        print(error)
+                    }
+                    if let selectedImage = image as? UIImage{
+                        DispatchQueue.main.async {
+                            self.createImageSticker(image: selectedImage)
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
 }
 

@@ -21,6 +21,16 @@
                                 <rect key="frame" x="0.0" y="118" width="393" height="666"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="diG-DP-hzV">
+                                <rect key="frame" x="8" y="126" width="105.66666666666667" height="43.333333333333314"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Add Image"/>
+                                <connections>
+                                    <action selector="addImageStickerAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3j3-l4-g9H"/>
+                                    <action selector="addTextStickerAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="grr-my-D0p"/>
+                                    <action selector="closeAction:" destination="lmi-gP-xH3" eventType="touchUpInside" id="L2e-nN-uFi"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yIA-WH-IwX">
                                 <rect key="frame" x="294" y="125.99999999999999" width="91" height="43.333333333333329"/>
                                 <state key="normal" title="Button"/>
@@ -35,9 +45,11 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="XCm-Nw-kYj" secondAttribute="bottom" id="0SI-5j-uus"/>
+                            <constraint firstItem="diG-DP-hzV" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="Aik-UX-8Ms"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XCm-Nw-kYj" secondAttribute="trailing" id="E3M-RS-JbB"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yIA-WH-IwX" secondAttribute="trailing" constant="8" id="HHT-zz-fc0"/>
                             <constraint firstItem="yIA-WH-IwX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="P8V-CK-mzh"/>
+                            <constraint firstItem="diG-DP-hzV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="WKn-jG-suf"/>
                             <constraint firstItem="XCm-Nw-kYj" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="dsI-dn-gTC"/>
                             <constraint firstItem="XCm-Nw-kYj" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="mtJ-42-haC"/>
                         </constraints>
