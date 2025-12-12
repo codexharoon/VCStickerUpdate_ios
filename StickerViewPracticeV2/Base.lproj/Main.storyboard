@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -20,12 +21,23 @@
                                 <rect key="frame" x="0.0" y="118" width="393" height="666"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yIA-WH-IwX">
+                                <rect key="frame" x="294" y="125.99999999999999" width="91" height="43.333333333333329"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Add Text"/>
+                                <connections>
+                                    <action selector="addTextStickerAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="1zG-PJ-FWD"/>
+                                    <action selector="closeAction:" destination="lmi-gP-xH3" eventType="touchUpInside" id="fQo-X2-617"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="XCm-Nw-kYj" secondAttribute="bottom" id="0SI-5j-uus"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XCm-Nw-kYj" secondAttribute="trailing" id="E3M-RS-JbB"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yIA-WH-IwX" secondAttribute="trailing" constant="8" id="HHT-zz-fc0"/>
+                            <constraint firstItem="yIA-WH-IwX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="P8V-CK-mzh"/>
                             <constraint firstItem="XCm-Nw-kYj" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="dsI-dn-gTC"/>
                             <constraint firstItem="XCm-Nw-kYj" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="mtJ-42-haC"/>
                         </constraints>
@@ -38,8 +50,69 @@
             </objects>
             <point key="canvasLocation" x="30" y="94"/>
         </scene>
+        <!--Text View Editor View Controller-->
+        <scene sceneID="AK9-yv-oq9">
+            <objects>
+                <viewController storyboardIdentifier="TextViewEditorViewController" id="lmi-gP-xH3" customClass="TextViewEditorViewController" customModule="StickerViewPracticeV2" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="h3s-0J-6RI">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2DU-Iu-NBm">
+                                <rect key="frame" x="8" y="125.99999999999999" width="46.333333333333336" height="34.333333333333329"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="xmark" catalog="system"/>
+                                <connections>
+                                    <action selector="closeAction:" destination="lmi-gP-xH3" eventType="touchUpInside" id="1Of-e6-xgf"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UmD-Q2-tY2">
+                                <rect key="frame" x="337.33333333333331" y="125.99999999999999" width="47.666666666666686" height="34.333333333333329"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="checkmark" catalog="system"/>
+                                <connections>
+                                    <action selector="doneAction:" destination="lmi-gP-xH3" eventType="touchUpInside" id="FtN-cs-mOF"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="JRh-rM-buW">
+                                <rect key="frame" x="16" y="192.33333333333337" width="361" height="200"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="Iku-0T-woa"/>
+                                </constraints>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="MwV-jP-HyC"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="2DU-Iu-NBm" firstAttribute="top" secondItem="MwV-jP-HyC" secondAttribute="top" constant="8" id="5LN-Pi-KrE"/>
+                            <constraint firstItem="JRh-rM-buW" firstAttribute="top" secondItem="2DU-Iu-NBm" secondAttribute="bottom" constant="32" id="993-yt-nJO"/>
+                            <constraint firstItem="2DU-Iu-NBm" firstAttribute="leading" secondItem="MwV-jP-HyC" secondAttribute="leading" constant="8" id="Lzd-LD-uTe"/>
+                            <constraint firstItem="MwV-jP-HyC" firstAttribute="trailing" secondItem="JRh-rM-buW" secondAttribute="trailing" constant="16" id="SZm-Gn-4qF"/>
+                            <constraint firstItem="JRh-rM-buW" firstAttribute="leading" secondItem="MwV-jP-HyC" secondAttribute="leading" constant="16" id="q3M-PM-vDV"/>
+                            <constraint firstItem="UmD-Q2-tY2" firstAttribute="top" secondItem="MwV-jP-HyC" secondAttribute="top" constant="8" id="r8o-xo-ckG"/>
+                            <constraint firstItem="MwV-jP-HyC" firstAttribute="trailing" secondItem="UmD-Q2-tY2" secondAttribute="trailing" constant="8" id="ryn-fl-a53"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textView" destination="JRh-rM-buW" id="uK0-Iq-0Hd"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ZP4-63-9m2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1052" y="94"/>
+        </scene>
     </scenes>
     <resources>
+        <image name="checkmark" catalog="system" width="128" height="114"/>
+        <image name="xmark" catalog="system" width="128" height="113"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

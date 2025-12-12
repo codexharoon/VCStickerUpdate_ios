@@ -11,11 +11,31 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var stickerView: UIView!
     
+    
+    var textStickers: [VCTextViewSticker] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        setupSticker()
+//        setupSticker()
+    }
+    
+    
+    
+    @IBAction func addTextStickerAction(_ sender: Any) {
+        let textViewEditVC = self.getTextViewEditorVC()
+        
+        textViewEditVC.onDoneTap = { [weak self] text in
+            guard let self = self else { return }
+            let _ = self.createTextSticker(text: text)
+//            let textSticker = self.createTextSticker(text: text)
+//            self.textStickers.append(textSticker)
+//            self.setupAllTextStickers()
+            
+        }
+        
+        self.present(textViewEditVC, animated: true)
     }
     
     
@@ -39,6 +59,62 @@ class ViewController: UIViewController {
 //        textSticker.shadowEnable = true
 //        textSticker.stickerShadowOffset = CGSize(width: 0, height: 0)
         stickerView.addSubview(textSticker)
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
+        gesture.numberOfTapsRequired = 2
+        
+        textSticker.isUserInteractionEnabled = true
+        textSticker.addGestureRecognizer(gesture)
+    }
+    
+    
+    @objc
+    func handleDoubleTapGesture(_ gesture: UITapGestureRecognizer){
+        guard let stickerView = gesture.view as? VCTextViewSticker else {return}
+        
+        let textViewEditorVC = self.getTextViewEditorVC()
+        textViewEditorVC.text = stickerView.text
+        
+        textViewEditorVC.onDoneTap = { text in
+            stickerView.text = text
+        }
+        
+        present(textViewEditorVC, animated: true)
+    }
+    
+    
+    func getTextViewEditorVC() -> TextViewEditorViewController {
+        let textViewEditorVC = self.storyboard?.instantiateViewController(withIdentifier: "TextViewEditorViewController") as! TextViewEditorViewController
+        return textViewEditorVC
+    }
+    
+    
+    
+    func createTextSticker(text: String) -> VCTextViewSticker {
+        let textSticker = VCTextViewSticker(center: self.view.center)
+        textSticker.borderStyle = .dotted
+        textSticker.borderColor = .systemTeal
+        
+        textSticker.text = text
+        textSticker.stickerTextColor = .label
+        textSticker.stickerAlignment = .center
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
+        gesture.numberOfTapsRequired = 2
+        
+        textSticker.isUserInteractionEnabled = true
+        textSticker.addGestureRecognizer(gesture)
+        
+        self.stickerView.addSubview(textSticker)
+        
+        return textSticker
+    }
+    
+    
+    func setupAllTextStickers(){
+        for sticker in textStickers {
+            self.stickerView.addSubview(sticker)
+        }
     }
 
 
