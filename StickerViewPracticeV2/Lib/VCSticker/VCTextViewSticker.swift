@@ -75,7 +75,12 @@ public class VCTextViewSticker: VCBaseSticker {
     @objc public var text: String? {
         didSet {
             guard let newText = text, !newText.isEmpty else { return }
-            setupInitialLayout()
+            // Only establish initial layout once. After that, keep current size and reflow text.
+            if !isLayoutEstablished {
+                setupInitialLayout()
+            } else {
+                updateTextDisplay()
+            }
         }
     }
 
@@ -193,6 +198,11 @@ public class VCTextViewSticker: VCBaseSticker {
     // ----------------------------------------------------------
 
     private func setupInitialLayout() {
+        // Guard against re-entry: only compute reference once
+        if isLayoutEstablished {
+            updateTextDisplay()
+            return
+        }
         guard let text = self.text else { return }
 
         let font = buildFont(pointSize: referenceFontSize)
@@ -207,6 +217,7 @@ public class VCTextViewSticker: VCBaseSticker {
             height: max(idealHeight, kMinFrameHeight)
         )
 
+        // Capture the initial bounds to use as the scaling reference going forward
         referenceBounds = self.bounds.size
         isLayoutEstablished = true
         updateTextDisplay()
@@ -214,6 +225,11 @@ public class VCTextViewSticker: VCBaseSticker {
 
     private func updateTextDisplay() {
         guard let text = self.text else { return }
+        guard referenceBounds.width > 0 && referenceBounds.height > 0 else {
+            // If somehow not established, fall back to initial layout
+            setupInitialLayout()
+            return
+        }
 
         let widthScale = bounds.width / referenceBounds.width
         let heightScale = bounds.height / referenceBounds.height
