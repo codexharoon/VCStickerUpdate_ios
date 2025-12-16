@@ -22,7 +22,7 @@ class TextViewEditorViewController: UIViewController {
         
         textView.isEditable = true
         textView.layer.borderWidth = 1
-        textView.layer.borderColor = UIColor.black.cgColor
+        textView.layer.borderColor = UIColor.label.cgColor
         textView.layer.cornerRadius = 15
         
         self.textView.text = text

@@ -12,13 +12,32 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 
     @IBOutlet weak var stickerView: UIView!
     
+    @IBOutlet weak var stickersToolContainer: UIView!
+    
+    @IBOutlet weak var imagesToolsContainer: UIView!
+    
+    @IBOutlet weak var textToolsContainer: UIView!
+    @IBOutlet weak var boldBtn: UIButton!
+    @IBOutlet weak var italicBtn: UIButton!
+    @IBOutlet weak var redColorBtn: UIButton!
+    @IBOutlet weak var labelColorBtn: UIButton!
+    
+    
     var allStickers: [VCBaseSticker] = []
+    
+    var activeSticker: VCBaseSticker?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
 //        setupSticker()
+        
+        stickersToolContainer.layer.borderColor = UIColor.gray.cgColor
+        stickersToolContainer.layer.borderWidth = 1.0
+        stickersToolContainer.layer.cornerRadius = 20
+        
+        stickerToolsContainerIsHidden(true)
     }
     
     
@@ -50,6 +69,35 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         picker.modalPresentationStyle = .fullScreen
         
         self.present(picker, animated: true)
+    }
+    
+    
+    
+    @IBAction func boldAction(_ sender: Any) {
+        if let sticker = self.activeSticker as? VCTextViewSticker {
+            sticker.stickerIsBold = !sticker.stickerIsBold
+        }
+    }
+    
+    
+    @IBAction func italicAction(_ sender: Any) {
+        if let sticker = self.activeSticker as? VCTextViewSticker {
+            sticker.stickerIsItalic = !sticker.stickerIsItalic
+        }
+    }
+    
+    
+    @IBAction func redColorAction(_ sender: Any) {
+        if let sticker = self.activeSticker as? VCTextViewSticker {
+            sticker.stickerTextColor = .systemRed
+        }
+    }
+    
+    
+    @IBAction func labelColorBtnAction(_ sender: Any) {
+        if let sticker = self.activeSticker as? VCTextViewSticker {
+            sticker.stickerTextColor = .label
+        }
     }
     
     
@@ -91,6 +139,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         textViewEditorVC.onDoneTap = { text in
             stickerView.text = text
+            self.setupAllStickers()
+            stickerView.beginEditing()
         }
         
         present(textViewEditorVC, animated: true)
@@ -156,6 +206,13 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             for other in self.allStickers where other !== selected {
                 other.finishEditing()
             }
+            
+            self.activeSticker = selected
+            self.handleToolsForActiveSticker()
+        }
+        
+        sticker.onFinishEditing = {[weak self] in
+            self?.stickerToolsContainerIsHidden(true)
         }
         
         sticker.onClose = { [weak self, weak sticker] in
@@ -164,7 +221,34 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             if let idx = self.allStickers.firstIndex(where: { $0 === s }) {
                 self.allStickers.remove(at: idx)
             }
+            
+            self.activeSticker = nil
+            self.handleToolsForActiveSticker()
         }
+    }
+    
+    
+    func handleToolsForActiveSticker(){
+        if let _ = self.activeSticker as? VCImageSticker {
+            stickersToolContainer.isHidden = false
+            imagesToolsContainer.isHidden = false
+            textToolsContainer.isHidden = true
+        }
+        else if let _ = self.activeSticker as? VCTextViewSticker {
+            stickersToolContainer.isHidden = false
+            imagesToolsContainer.isHidden = true
+            textToolsContainer.isHidden = false
+        }
+        else{
+            stickerToolsContainerIsHidden(true)
+        }
+    }
+    
+    
+    func stickerToolsContainerIsHidden(_ status: Bool){
+        self.stickersToolContainer.isHidden = status
+        self.imagesToolsContainer.isHidden = status
+        self.textToolsContainer.isHidden = status
     }
 
 
@@ -197,4 +281,3 @@ extension ViewController {
         }
     }
 }
-

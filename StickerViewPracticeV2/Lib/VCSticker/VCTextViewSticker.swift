@@ -13,7 +13,7 @@ public class VCTextViewSticker: VCBaseSticker {
     // ----------------------------------------------------------
 
     @objc public var stickerTextColor: UIColor = .black {
-        didSet { applyTextAttributes() }
+        didSet { updateTextDisplay() }
     }
 
     @objc public var stickerOpacity: CGFloat = 1.0 {
@@ -21,27 +21,27 @@ public class VCTextViewSticker: VCBaseSticker {
     }
 
     @objc public var stickerFontName: String = UIFont.systemFont(ofSize: 24).fontName {
-        didSet { applyTextAttributes() }
+        didSet { updateTextDisplay() }
     }
 
     @objc public var stickerIsBold: Bool = false {
-        didSet { applyTextAttributes() }
+        didSet { updateTextDisplay() }
     }
 
     @objc public var stickerIsItalic: Bool = false {
-        didSet { applyTextAttributes() }
+        didSet { updateTextDisplay() }
     }
 
     @objc public var stickerAlignment: NSTextAlignment = .center {
-        didSet { applyTextAttributes() }
+        didSet { updateTextDisplay() }
     }
 
     @objc public var lineSpacing: CGFloat = 0 {
-        didSet { applyTextAttributes() }
+        didSet { updateTextDisplay() }
     }
 
     @objc public var letterSpacing: CGFloat = 0 {
-        didSet { applyTextAttributes() }
+        didSet { updateTextDisplay() }
     }
 
     // SHADOW PROPERTIES
@@ -242,6 +242,7 @@ public class VCTextViewSticker: VCBaseSticker {
 
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = stickerAlignment
+        paragraph.lineSpacing = lineSpacing
 
         let attributes: [NSAttributedString.Key : Any] = [
             .font: font,
@@ -278,6 +279,7 @@ public class VCTextViewSticker: VCBaseSticker {
     private func measure(text: String, font: UIFont, width: CGFloat) -> CGSize {
         let paragraph = NSMutableParagraphStyle()
         paragraph.alignment = stickerAlignment
+        paragraph.lineSpacing = lineSpacing
 
         let attr: [NSAttributedString.Key : Any] = [
             .font: font,
@@ -296,11 +298,12 @@ public class VCTextViewSticker: VCBaseSticker {
     private func calculateTextSize(text: String, font: UIFont, maxWidth: CGFloat) -> CGSize {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = stickerAlignment
+        paragraphStyle.lineSpacing = lineSpacing
 
         return (text as NSString).boundingRect(
             with: CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude),
             options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: [.font: font, .paragraphStyle: paragraphStyle],
+            attributes: [.font: font, .paragraphStyle: paragraphStyle, .kern: letterSpacing],
             context: nil
         ).size
     }

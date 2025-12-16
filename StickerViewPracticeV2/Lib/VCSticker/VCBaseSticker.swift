@@ -21,6 +21,7 @@ let kMinFrameHeight: CGFloat = 35
 
 open class VCBaseSticker: UIView {
     @objc public var onBeginEditing: (() -> Void)?
+    @objc public var onFinishEditing: (() -> Void)?
     @objc public var onClose: (() -> Void)?
     
     var closeImage  = VCAsserts.closeImage
@@ -219,6 +220,7 @@ open class VCBaseSticker: UIView {
         rotateBtn.isHidden = true
         resizeBtnTopRight.isHidden = true
         border.removeFromSuperlayer()
+        onFinishEditing?()
     }
 }
 
