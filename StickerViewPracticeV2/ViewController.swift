@@ -101,6 +101,37 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     }
     
     
+    @IBAction func font1Action(_ sender: Any) {
+        if let sticker = self.activeSticker as? VCTextViewSticker {
+            sticker.stickerFontName = "Avenir-Black"
+        }
+    }
+    
+    
+    @IBAction func font2Action(_ sender: Any) {
+        if let sticker = self.activeSticker as? VCTextViewSticker {
+            sticker.stickerFontName = "New York"
+        }
+    }
+    
+    
+    @IBAction func shadowSwitchAction(_ sender: UISwitch) {
+        
+        if let sticker = self.activeSticker as? VCTextViewSticker {
+            if sender.isOn == true {
+                sticker.shadowEnable = true
+                sticker.stickerShadowColor = .black
+                sticker.stickerShadowOpacity = 0.34
+                sticker.stickerShadowRadius = 8
+                sticker.stickerShadowOffset = CGSize(width: 0, height:  4)
+            }
+            else{
+                sticker.shadowEnable = false
+            }
+        }
+    }
+    
+    
     
     func setupSticker(){
         let imageSticker = VCImageSticker(frame: CGRect(x: 20, y: 40, width: 200, height: 200))
