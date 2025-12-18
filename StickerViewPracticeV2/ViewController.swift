@@ -33,6 +33,10 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
 //        setupSticker()
         
+        stickerView.layer.borderColor = UIColor.label.cgColor
+        stickerView.layer.borderWidth = 1.0
+        stickerView.layer.cornerRadius = 20
+        
         stickersToolContainer.layer.borderColor = UIColor.gray.cgColor
         stickersToolContainer.layer.borderWidth = 1.0
         stickersToolContainer.layer.cornerRadius = 20
@@ -43,18 +47,27 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     @IBAction func addTextStickerAction(_ sender: Any) {
-        let textViewEditVC = self.getTextViewEditorVC()
+//        let textViewEditVC = self.getTextViewEditorVC()
+//        
+//        textViewEditVC.onDoneTap = { [weak self] text in
+//            guard let self = self else { return }
+//            
+//            let textSticker = self.createTextSticker(text: text)
+//            self.allStickers.append(textSticker)
+//            self.setupAllStickers()
+//            textSticker.beginEditing()
+//        }
+//        
+//        self.present(textViewEditVC, animated: true)
         
-        textViewEditVC.onDoneTap = { [weak self] text in
-            guard let self = self else { return }
-            
-            let textSticker = self.createTextSticker(text: text)
-            self.allStickers.append(textSticker)
-            self.setupAllStickers()
-            textSticker.beginEditing()
+        SVGCanvasLoader.load(
+                svgNamed: "4",
+                into: stickerView,
+                stickers: &allStickers
+            ){ sticker in
+                self.wireStickerCallbacks(sticker)
         }
         
-        self.present(textViewEditVC, animated: true)
     }
     
     

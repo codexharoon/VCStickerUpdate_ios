@@ -18,8 +18,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XCm-Nw-kYj">
-                                <rect key="frame" x="0.0" y="118" width="393" height="666"/>
+                                <rect key="frame" x="16" y="226" width="361" height="400"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="361" id="IOb-bj-5Ui"/>
+                                    <constraint firstAttribute="height" constant="400" id="S5V-UH-OrI"/>
+                                </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="diG-DP-hzV">
                                 <rect key="frame" x="8" y="125.99999999999999" width="105.66666666666667" height="43.333333333333329"/>
@@ -165,15 +169,14 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="XCm-Nw-kYj" secondAttribute="bottom" id="0SI-5j-uus"/>
+                            <constraint firstItem="XCm-Nw-kYj" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="7XY-iL-9EQ"/>
                             <constraint firstItem="diG-DP-hzV" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="Aik-UX-8Ms"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XCm-Nw-kYj" secondAttribute="trailing" id="E3M-RS-JbB"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XCm-Nw-kYj" secondAttribute="trailing" constant="16" id="E3M-RS-JbB"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yIA-WH-IwX" secondAttribute="trailing" constant="8" id="HHT-zz-fc0"/>
                             <constraint firstItem="yIA-WH-IwX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="P8V-CK-mzh"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yuP-Ug-LDW" secondAttribute="trailing" constant="12" id="QQu-b8-fOR"/>
                             <constraint firstItem="diG-DP-hzV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="WKn-jG-suf"/>
-                            <constraint firstItem="XCm-Nw-kYj" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="dsI-dn-gTC"/>
-                            <constraint firstItem="XCm-Nw-kYj" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="mtJ-42-haC"/>
+                            <constraint firstItem="XCm-Nw-kYj" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mtJ-42-haC"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="yuP-Ug-LDW" secondAttribute="bottom" constant="32" id="oU9-rz-Oku"/>
                             <constraint firstItem="yuP-Ug-LDW" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="12" id="s2n-Op-XfZ"/>
                         </constraints>

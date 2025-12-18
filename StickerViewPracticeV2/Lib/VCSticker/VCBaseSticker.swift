@@ -109,6 +109,19 @@ open class VCBaseSticker: UIView {
         
         border.path  = UIBezierPath(rect: contentView.bounds).cgPath
         border.frame = contentView.bounds
+        
+        // Apply inverse scale to control buttons so they remain a constant visual size
+        let currentScale = sqrt(transform.a * transform.a + transform.c * transform.c)
+        if currentScale > 0.001 {
+            let inverseScale = 1.0 / currentScale
+            let inverseTransform = CGAffineTransform(scaleX: inverseScale, y: inverseScale)
+            closeBtn.transform = inverseTransform
+            rotateBtn.transform = inverseTransform
+            resizeBtnTopRight.transform = inverseTransform
+            
+            // Also scale the border line width inversely
+            border.lineWidth = 1.0 * inverseScale
+        }
     }
     
     // 删除外部设置的无用约束(约束会影响当前代码中设置bound和frame的效果)
@@ -272,6 +285,9 @@ extension VCBaseSticker {
             let delta = angle - self.lastAngle
             self.transform = self.transform.rotated(by: delta)
             self.lastAngle = angle
+            
+            // Trigger layout update to recalculate inverse scale for buttons
+            setNeedsLayout()
         }
     }
     
@@ -286,16 +302,15 @@ extension VCBaseSticker {
         if gesture.state == .began {
             self.lastDistance = distance
         } else if gesture.state == .changed {
-            // 缩放
-            let scale = distance / self.lastDistance
+            // Calculate scale factor relative to last distance
+            let scaleFactor = distance / self.lastDistance
             
-            let newWidth  = self.bounds.width * scale
-            let newHeight = self.bounds.height * scale
-            if (newWidth >= kMinFrameWidth) && (newHeight >= kMinFrameHeight) {
-                // 修改当前view的真实大小（不使用transform）
-                self.bounds = CGRect(x: 0, y: 0, width: newWidth, height: newHeight)
-                self.lastDistance = distance
-            }
+            // Apply scale to transform (works with existing transforms)
+            self.transform = self.transform.scaledBy(x: scaleFactor, y: scaleFactor)
+            self.lastDistance = distance
+            
+            // Trigger layout update to recalculate inverse scale for buttons
+            setNeedsLayout()
         }
     }
     

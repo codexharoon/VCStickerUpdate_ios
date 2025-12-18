@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BECFED0E2EF16D46003687E9 /* SVGKit in Frameworks */ = {isa = PBXBuildFile; productRef = BECFED0D2EF16D46003687E9 /* SVGKit */; };
+		BECFED102EF16D46003687E9 /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = BECFED0F2EF16D46003687E9 /* SVGKitSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		BE1AAFAC2EE97AA20098AC83 /* StickerViewPracticeV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StickerViewPracticeV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +41,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BECFED102EF16D46003687E9 /* SVGKitSwift in Frameworks */,
+				BECFED0E2EF16D46003687E9 /* SVGKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,8 @@
 			);
 			name = StickerViewPracticeV2;
 			packageProductDependencies = (
+				BECFED0D2EF16D46003687E9 /* SVGKit */,
+				BECFED0F2EF16D46003687E9 /* SVGKitSwift */,
 			);
 			productName = StickerViewPracticeV2;
 			productReference = BE1AAFAC2EE97AA20098AC83 /* StickerViewPracticeV2.app */;
@@ -107,6 +116,9 @@
 			);
 			mainGroup = BE1AAFA32EE97AA20098AC83;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BECFED0C2EF16D46003687E9 /* XCRemoteSwiftPackageReference "SVGKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BE1AAFAD2EE97AA20098AC83 /* Products */;
 			projectDirPath = "";
@@ -349,6 +361,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BECFED0C2EF16D46003687E9 /* XCRemoteSwiftPackageReference "SVGKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SVGKit/SVGKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BECFED0D2EF16D46003687E9 /* SVGKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BECFED0C2EF16D46003687E9 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKit;
+		};
+		BECFED0F2EF16D46003687E9 /* SVGKitSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BECFED0C2EF16D46003687E9 /* XCRemoteSwiftPackageReference "SVGKit" */;
+			productName = SVGKitSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BE1AAFA42EE97AA20098AC83 /* Project object */;
 }
