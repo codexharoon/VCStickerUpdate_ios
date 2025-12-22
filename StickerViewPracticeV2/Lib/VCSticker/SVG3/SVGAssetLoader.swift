@@ -8,8 +8,6 @@
 
 import SVGKit
 
-import SVGKit
-
 final class SVGAssetLoader {
 
     static func loadSVG(named name: String) -> SVGKImage? {
@@ -37,4 +35,3 @@ final class SVGAssetLoader {
         return svgImage
     }
 }
-
