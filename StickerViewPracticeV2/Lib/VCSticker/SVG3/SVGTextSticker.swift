@@ -15,19 +15,19 @@ public final class SVGTextSticker: VCBaseSticker {
     // MARK: - Text Properties
     
     public var text: String = "" {
-        didSet { updateTextLayer() }
+        didSet { updateTextLayerAndResize() }
     }
 
     public var fontName: String? = nil {  // nil = use system font
-        didSet { updateTextLayer() }
+        didSet { updateTextLayerAndResize() }
     }
 
     public var fontSize: CGFloat = 24 {
-        didSet { updateTextLayer() }
+        didSet { updateTextLayerAndResize() }
     }
 
     public var textColor: UIColor = .label {
-        didSet { updateTextLayer() }
+        didSet { updateTextLayer() }  // Color doesn't affect size
     }
 
     public var textAlignment: NSTextAlignment = .center {
@@ -39,11 +39,11 @@ public final class SVGTextSticker: VCBaseSticker {
     // MARK: - Font Style Properties
     
     public var isBold: Bool = false {
-        didSet { updateTextLayer() }
+        didSet { updateTextLayerAndResize() }
     }
     
     public var isItalic: Bool = false {
-        didSet { updateTextLayer() }
+        didSet { updateTextLayerAndResize() }
     }
 
     // MARK: - Shadow Properties
@@ -132,6 +132,16 @@ public final class SVGTextSticker: VCBaseSticker {
         textLayer.string = NSAttributedString(string: text, attributes: attributes)
     }
     
+    /// Update text layer and resize sticker to fit the new text
+    private func updateTextLayerAndResize() {
+        updateTextLayer()
+        
+        // Only resize if the view is already in the view hierarchy
+        if superview != nil {
+            sizeToFitText()
+        }
+    }
+    
     private func updateShadow() {
         if textShadowEnabled {
             textLayer.shadowColor = textShadowColor.cgColor
@@ -198,5 +208,55 @@ public final class SVGTextSticker: VCBaseSticker {
     /// Remove stroke
     public func removeStroke() {
         self.strokeEnabled = false
+    }
+    
+    // MARK: - Size Adjustment
+    
+    /// Resize the sticker to fit the current text content
+    public func sizeToFitText(padding: CGFloat = 20, animated: Bool = true) {
+        let font = SVGPropertyHelper.createFont(
+            name: fontName,
+            size: fontSize,
+            isBold: isBold,
+            isItalic: isItalic
+        )
+        
+        // Calculate the size needed for the text
+        let maxSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        let textSize = (text as NSString).boundingRect(
+            with: maxSize,
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        ).size
+        
+        // Add padding
+        let newWidth = ceil(textSize.width) + padding * 2
+        let newHeight = ceil(textSize.height) + padding * 2
+        
+        // Get the current center before changing bounds
+        let currentCenter = self.center
+        let newBounds = CGRect(x: 0, y: 0, width: newWidth, height: newHeight)
+        
+        if animated && superview != nil {
+            // Smooth animation for professional feel
+            UIView.animate(
+                withDuration: 0.2,
+                delay: 0,
+                options: [.curveEaseInOut, .allowUserInteraction],
+                animations: {
+                    self.bounds = newBounds
+                    self.center = currentCenter
+                    self.layoutIfNeeded()
+                },
+                completion: nil
+            )
+        } else {
+            // No animation
+            self.bounds = newBounds
+            self.center = currentCenter
+            setNeedsLayout()
+            layoutIfNeeded()
+        }
     }
 }

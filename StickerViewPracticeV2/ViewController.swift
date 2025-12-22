@@ -61,11 +61,19 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 //        self.present(textViewEditVC, animated: true)
         
         SVGCanvasLoader.load(
-                svgNamed: "4",
+                svgNamed: "3",
                 into: stickerView,
                 stickers: &allStickers
             ){ sticker in
                 self.wireStickerCallbacks(sticker)
+                
+                // Add double-tap gesture for text editing on SVG text stickers
+                if sticker is SVGTextSticker {
+                    let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTapGesture))
+                    gesture.numberOfTapsRequired = 2
+                    sticker.isUserInteractionEnabled = true
+                    sticker.addGestureRecognizer(gesture)
+                }
         }
         
     }
@@ -89,6 +97,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBAction func boldAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
             sticker.stickerIsBold = !sticker.stickerIsBold
+        } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            svgTextSticker.isBold = !svgTextSticker.isBold
         }
     }
     
@@ -96,6 +106,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBAction func italicAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
             sticker.stickerIsItalic = !sticker.stickerIsItalic
+        } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            svgTextSticker.isItalic = !svgTextSticker.isItalic
         }
     }
     
@@ -103,6 +115,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBAction func redColorAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
             sticker.stickerTextColor = .systemRed
+        } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            svgTextSticker.textColor = .systemRed
         }
     }
     
@@ -110,20 +124,26 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBAction func labelColorBtnAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
             sticker.stickerTextColor = .label
+        } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            svgTextSticker.textColor = .label
         }
     }
     
     
     @IBAction func font1Action(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
-            sticker.stickerFontName = "Avenir-Black"
+            sticker.stickerFontName = "Georgia"
+        } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            svgTextSticker.fontName = "Georgia"
         }
     }
     
     
     @IBAction func font2Action(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
-            sticker.stickerFontName = "New York"
+            sticker.stickerFontName = "NewYork-Regular"
+        } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            svgTextSticker.fontName = "NewYork-Regular"
         }
     }
     
@@ -140,6 +160,17 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             }
             else{
                 sticker.shadowEnable = false
+            }
+        } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            if sender.isOn {
+                svgTextSticker.applyShadow(
+                    color: .black,
+                    offset: CGSize(width: 0, height: 4),
+                    blur: 8,
+                    opacity: 0.34
+                )
+            } else {
+                svgTextSticker.removeShadow()
             }
         }
     }
@@ -176,18 +207,31 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     @objc
     func handleDoubleTapGesture(_ gesture: UITapGestureRecognizer){
-        guard let stickerView = gesture.view as? VCTextViewSticker else {return}
-        
-        let textViewEditorVC = self.getTextViewEditorVC()
-        textViewEditorVC.text = stickerView.text
-        
-        textViewEditorVC.onDoneTap = { text in
-            stickerView.text = text
-            self.setupAllStickers()
-            stickerView.beginEditing()
+        // Handle VCTextViewSticker
+        if let textViewSticker = gesture.view as? VCTextViewSticker {
+            let textViewEditorVC = self.getTextViewEditorVC()
+            textViewEditorVC.text = textViewSticker.text
+            
+            textViewEditorVC.onDoneTap = { text in
+                textViewSticker.text = text
+                self.setupAllStickers()
+                textViewSticker.beginEditing()
+            }
+            
+            present(textViewEditorVC, animated: true)
         }
-        
-        present(textViewEditorVC, animated: true)
+        // Handle SVGTextSticker
+        else if let svgTextSticker = gesture.view as? SVGTextSticker {
+            let textViewEditorVC = self.getTextViewEditorVC()
+            textViewEditorVC.text = svgTextSticker.text
+            
+            textViewEditorVC.onDoneTap = { [weak svgTextSticker] text in
+                svgTextSticker?.text = text
+                svgTextSticker?.beginEditing()
+            }
+            
+            present(textViewEditorVC, animated: true)
+        }
     }
     
     
@@ -282,6 +326,18 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             stickersToolContainer.isHidden = false
             imagesToolsContainer.isHidden = true
             textToolsContainer.isHidden = false
+        }
+        else if let _ = self.activeSticker as? SVGTextSticker {
+            // Show text tools for SVG text stickers too
+            stickersToolContainer.isHidden = false
+            imagesToolsContainer.isHidden = true
+            textToolsContainer.isHidden = false
+        }
+        else if let _ = self.activeSticker as? SVGImageSticker {
+            // Show image tools for SVG shape stickers
+            stickersToolContainer.isHidden = false
+            imagesToolsContainer.isHidden = false
+            textToolsContainer.isHidden = true
         }
         else{
             stickerToolsContainerIsHidden(true)

@@ -269,19 +269,21 @@ final class SVGPropertyHelper {
             font = UIFont.systemFont(ofSize: size, weight: weight)
         }
         
-        // Apply italic if needed
-        if isItalic {
-            let descriptor = font.fontDescriptor.withSymbolicTraits(.traitItalic)
-            if let italicDescriptor = descriptor {
-                font = UIFont(descriptor: italicDescriptor, size: size)
-            }
+        // Build combined traits
+        var traits: UIFontDescriptor.SymbolicTraits = font.fontDescriptor.symbolicTraits
+        
+        if isBold {
+            traits.insert(.traitBold)
         }
         
-        // Apply bold if needed and font isn't already bold
-        if isBold && !font.fontDescriptor.symbolicTraits.contains(.traitBold) {
-            let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold)
-            if let boldDescriptor = descriptor {
-                font = UIFont(descriptor: boldDescriptor, size: size)
+        if isItalic {
+            traits.insert(.traitItalic)
+        }
+        
+        // Apply combined traits if different from current
+        if traits != font.fontDescriptor.symbolicTraits {
+            if let descriptor = font.fontDescriptor.withSymbolicTraits(traits) {
+                font = UIFont(descriptor: descriptor, size: size)
             }
         }
         
