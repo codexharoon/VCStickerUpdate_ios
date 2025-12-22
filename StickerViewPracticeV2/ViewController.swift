@@ -15,13 +15,14 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBOutlet weak var stickersToolContainer: UIView!
     
     @IBOutlet weak var imagesToolsContainer: UIView!
+    @IBOutlet weak var imgOpacitySlider: UISlider!
     
     @IBOutlet weak var textToolsContainer: UIView!
     @IBOutlet weak var boldBtn: UIButton!
     @IBOutlet weak var italicBtn: UIButton!
     @IBOutlet weak var redColorBtn: UIButton!
     @IBOutlet weak var labelColorBtn: UIButton!
-    
+    @IBOutlet weak var shadowSwitch: UISwitch!
     
     var allStickers: [VCBaseSticker] = []
     
@@ -92,7 +93,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         self.present(picker, animated: true)
     }
     
-    
+    // text tools
     
     @IBAction func boldAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
@@ -174,6 +175,41 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             }
         }
     }
+    
+    
+    // images tools
+    
+    @IBAction func imgOpacitySliderAction(_ sender: UISlider) {
+        let opacity = sender.value  // 0.0 to 1.0
+        
+        if let imageSticker = self.activeSticker as? VCImageSticker {
+            imageSticker.imageView.alpha = CGFloat(opacity)
+        } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            svgImageSticker.imageOpacity = opacity
+        }
+    }
+    
+    
+    @IBAction func imgRedBtn(_ sender: Any) {
+        if let imageSticker = self.activeSticker as? VCImageSticker {
+            imageSticker.imageView.tintColor = .systemRed
+            imageSticker.imageView.image = imageSticker.imageView.image?.withRenderingMode(.alwaysTemplate)
+        } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            svgImageSticker.applyTint(.systemRed)
+        }
+    }
+    
+    
+    @IBAction func imgLabelBtn(_ sender: Any) {
+        // Reset to original colors
+        if let imageSticker = self.activeSticker as? VCImageSticker {
+            imageSticker.imageView.tintColor = nil
+            imageSticker.imageView.image = imageSticker.imageView.image?.withRenderingMode(.alwaysOriginal)
+        } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            svgImageSticker.applyTint(nil)  // Reset to original
+        }
+    }
+    
     
     
     
@@ -317,27 +353,34 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     func handleToolsForActiveSticker(){
-        if let _ = self.activeSticker as? VCImageSticker {
+        if let imageSticker = self.activeSticker as? VCImageSticker {
             stickersToolContainer.isHidden = false
             imagesToolsContainer.isHidden = false
             textToolsContainer.isHidden = true
+            // Sync slider with current opacity
+            imgOpacitySlider.value = Float(imageSticker.imageView.alpha)
         }
         else if let _ = self.activeSticker as? VCTextViewSticker {
             stickersToolContainer.isHidden = false
             imagesToolsContainer.isHidden = true
             textToolsContainer.isHidden = false
         }
-        else if let _ = self.activeSticker as? SVGTextSticker {
+        else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             // Show text tools for SVG text stickers too
             stickersToolContainer.isHidden = false
             imagesToolsContainer.isHidden = true
             textToolsContainer.isHidden = false
+            
+            shadowSwitch.isOn = svgTextSticker.textShadowEnabled
         }
-        else if let _ = self.activeSticker as? SVGImageSticker {
+        else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             // Show image tools for SVG shape stickers
             stickersToolContainer.isHidden = false
             imagesToolsContainer.isHidden = false
             textToolsContainer.isHidden = true
+            // Sync slider with current opacity
+            imgOpacitySlider.value = svgImageSticker.imageOpacity
+            
         }
         else{
             stickerToolsContainerIsHidden(true)
