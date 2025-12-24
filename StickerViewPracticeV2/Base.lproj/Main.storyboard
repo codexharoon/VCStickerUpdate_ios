@@ -17,12 +17,26 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XCm-Nw-kYj">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4J1-2P-ceN">
                                 <rect key="frame" x="16" y="226" width="361" height="400"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XCm-Nw-kYj">
+                                        <rect key="frame" x="0.0" y="0.0" width="361" height="400"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="361" id="IOb-bj-5Ui"/>
+                                            <constraint firstAttribute="height" constant="400" id="S5V-UH-OrI"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="361" id="IOb-bj-5Ui"/>
-                                    <constraint firstAttribute="height" constant="400" id="S5V-UH-OrI"/>
+                                    <constraint firstItem="XCm-Nw-kYj" firstAttribute="top" secondItem="4J1-2P-ceN" secondAttribute="top" id="1GA-cQ-eRo"/>
+                                    <constraint firstAttribute="trailing" secondItem="XCm-Nw-kYj" secondAttribute="trailing" id="1lG-sZ-azg"/>
+                                    <constraint firstItem="XCm-Nw-kYj" firstAttribute="leading" secondItem="4J1-2P-ceN" secondAttribute="leading" id="Sv3-e2-Cof"/>
+                                    <constraint firstAttribute="height" constant="400" id="U22-4D-j0C"/>
+                                    <constraint firstAttribute="bottom" secondItem="XCm-Nw-kYj" secondAttribute="bottom" id="hFN-TE-Ebf"/>
+                                    <constraint firstAttribute="width" constant="361" id="rT2-Jc-sUO"/>
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="diG-DP-hzV">
@@ -190,19 +204,29 @@
                                     <constraint firstItem="u7N-uj-DJf" firstAttribute="top" secondItem="yuP-Ug-LDW" secondAttribute="top" id="reD-18-g64"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kiL-T3-9RX">
+                                <rect key="frame" x="328" y="175.66666666666666" width="49" height="34.333333333333343"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrow.down.circle.fill" catalog="system"/>
+                                <connections>
+                                    <action selector="saveSvgAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vjf-FA-Ryk"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="XCm-Nw-kYj" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="7XY-iL-9EQ"/>
                             <constraint firstItem="diG-DP-hzV" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="Aik-UX-8Ms"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="XCm-Nw-kYj" secondAttribute="trailing" constant="16" id="E3M-RS-JbB"/>
+                            <constraint firstItem="4J1-2P-ceN" firstAttribute="top" secondItem="kiL-T3-9RX" secondAttribute="bottom" constant="16" id="Ek5-ZM-gw8"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yIA-WH-IwX" secondAttribute="trailing" constant="8" id="HHT-zz-fc0"/>
+                            <constraint firstItem="4J1-2P-ceN" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="NRY-1R-XAq"/>
                             <constraint firstItem="yIA-WH-IwX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="P8V-CK-mzh"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yuP-Ug-LDW" secondAttribute="trailing" constant="12" id="QQu-b8-fOR"/>
                             <constraint firstItem="diG-DP-hzV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="WKn-jG-suf"/>
-                            <constraint firstItem="XCm-Nw-kYj" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="mtJ-42-haC"/>
+                            <constraint firstItem="4J1-2P-ceN" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="YyF-gH-mZy"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="4J1-2P-ceN" secondAttribute="trailing" constant="16" id="cST-sc-Hjq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="yuP-Ug-LDW" secondAttribute="bottom" constant="32" id="oU9-rz-Oku"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="kiL-T3-9RX" secondAttribute="trailing" constant="16" id="oly-Q1-kqs"/>
                             <constraint firstItem="yuP-Ug-LDW" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="12" id="s2n-Op-XfZ"/>
                         </constraints>
                     </view>
@@ -215,6 +239,7 @@
                         <outlet property="redColorBtn" destination="B3L-ip-1L7" id="dud-xx-I9E"/>
                         <outlet property="shadowSwitch" destination="KXY-iV-LyG" id="Rrh-RO-Uli"/>
                         <outlet property="stickerView" destination="XCm-Nw-kYj" id="DYy-YN-Lrx"/>
+                        <outlet property="stickerViewContainer" destination="4J1-2P-ceN" id="eVK-gs-c3U"/>
                         <outlet property="stickersToolContainer" destination="yuP-Ug-LDW" id="kAk-eQ-t9A"/>
                         <outlet property="textToolsContainer" destination="h6C-nn-yzc" id="zOs-SH-nkf"/>
                     </connections>
@@ -281,6 +306,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="arrow.down.circle.fill" catalog="system" width="128" height="123"/>
         <image name="bold" catalog="system" width="128" height="128"/>
         <image name="checkmark" catalog="system" width="128" height="114"/>
         <image name="italic" catalog="system" width="115" height="128"/>
@@ -292,7 +318,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.2196078431372549" blue="0.23529411764705882" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -11,6 +11,7 @@ import PhotosUI
 class ViewController: UIViewController, PHPickerViewControllerDelegate {
 
     @IBOutlet weak var stickerView: UIView!
+    @IBOutlet weak var stickerViewContainer: UIView!
     
     @IBOutlet weak var stickersToolContainer: UIView!
     
@@ -34,9 +35,9 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
 //        setupSticker()
         
-        stickerView.layer.borderColor = UIColor.label.cgColor
-        stickerView.layer.borderWidth = 1.0
-        stickerView.layer.cornerRadius = 20
+        stickerViewContainer.layer.borderColor = UIColor.label.cgColor
+        stickerViewContainer.layer.borderWidth = 1.0
+        stickerViewContainer.layer.cornerRadius = 20
         
         stickersToolContainer.layer.borderColor = UIColor.gray.cgColor
         stickersToolContainer.layer.borderWidth = 1.0
@@ -77,6 +78,17 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
                 }
         }
         
+    }
+    
+    
+    @IBAction func saveSvgAction(_ sender: Any) {
+        let exportedImage = SVGCanvasExporter.exportCanvasAsPNG(
+            stickerView,
+            stickers: allStickers
+        )
+        activeSticker = nil
+        
+        presentExportShareSheet(for: exportedImage, fileName: "Design_ \(Date().timeIntervalSince1970)", sourceView: self.view)
     }
     
     
@@ -164,14 +176,16 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             }
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             if sender.isOn {
-                svgTextSticker.applyShadow(
-                    color: .black,
-                    offset: CGSize(width: 0, height: 4),
-                    blur: 8,
-                    opacity: 0.34
-                )
+//                svgTextSticker.applyShadow(
+//                    color: .black,
+//                    offset: CGSize(width: 0, height: 4),
+//                    blur: 8,
+//                    opacity: 0.34
+//                )
+                svgTextSticker.applyStroke(color: .white, width: 6)
             } else {
-                svgTextSticker.removeShadow()
+//                svgTextSticker.removeShadow()
+                svgTextSticker.removeStroke()
             }
         }
     }
@@ -301,7 +315,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     func createImageSticker(image: UIImage) -> VCImageSticker {
-        let imageSticker = VCImageSticker(frame: CGRect(x: stickerView.center.x - 75 , y: stickerView.center.y - 75, width: 150, height: 150))
+        let imageSticker = VCImageSticker(frame: CGRect(x: stickerView.bounds.midX - 75 , y: stickerView.bounds.midY - 75, width: 150, height: 150))
         imageSticker.borderStyle = .dotted
         imageSticker.borderColor = .systemTeal
         imageSticker.imageView.image = image
