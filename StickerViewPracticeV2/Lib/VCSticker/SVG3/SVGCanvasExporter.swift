@@ -16,7 +16,9 @@ final class SVGCanvasExporter {
         _ canvasView: UIView,
         stickers: [VCBaseSticker],
         exportSize: CGSize = defaultExportSize
-    ) -> UIImage {
+    ) -> UIImage? {
+        if stickers.isEmpty {return nil}
+        
         // 1. Finish editing on all stickers to hide control elements and borders
         for sticker in stickers {
             sticker.finishEditing()
@@ -122,7 +124,7 @@ extension UIViewController {
             // Clean up temporary file
             SVGCanvasExporter.cleanupTempFile(fileURL)
             
-            if let error = error {
+            if let _ = error {
                 self?.showExportAlert(
                     title: "Export Failed",
                     message: "Export failed, Please try again."

@@ -35,7 +35,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
 //        setupSticker()
         
-        stickerViewContainer.layer.borderColor = UIColor.label.cgColor
+        stickerViewContainer.layer.borderColor = UIColor.gray.cgColor
         stickerViewContainer.layer.borderWidth = 1.0
         stickerViewContainer.layer.cornerRadius = 20
         
@@ -63,7 +63,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 //        self.present(textViewEditVC, animated: true)
         
         SVGCanvasLoader.load(
-                svgNamed: "3",
+                svgNamed: "2",
                 into: stickerView,
                 stickers: &allStickers
             ){ sticker in
@@ -82,13 +82,15 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     @IBAction func saveSvgAction(_ sender: Any) {
-        let exportedImage = SVGCanvasExporter.exportCanvasAsPNG(
+        if let exportedImage = SVGCanvasExporter.exportCanvasAsPNG(
             stickerView,
             stickers: allStickers
-        )
-        activeSticker = nil
+        ){
+            activeSticker = nil
+            
+            presentExportShareSheet(for: exportedImage, fileName: "Design_ \(Date().timeIntervalSince1970)", sourceView: self.view)
+        }
         
-        presentExportShareSheet(for: exportedImage, fileName: "Design_ \(Date().timeIntervalSince1970)", sourceView: self.view)
     }
     
     
