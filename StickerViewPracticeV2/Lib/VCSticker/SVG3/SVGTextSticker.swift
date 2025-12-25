@@ -99,7 +99,7 @@ public final class SVGTextSticker: VCBaseSticker {
         textLayer.alignmentMode = alignmentToCAMode(textAlignment)
         
         contentView.layer.addSublayer(textLayer)
-        updateTextLayer()
+        updateTextLayerAndResize()
     }
 
     override public func layoutSubviews() {

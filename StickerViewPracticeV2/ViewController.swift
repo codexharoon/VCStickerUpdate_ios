@@ -54,7 +54,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 //        textViewEditVC.onDoneTap = { [weak self] text in
 //            guard let self = self else { return }
 //            
-//            let textSticker = self.createTextSticker(text: text)
+//            let textSticker = self.createSvgTextSticker(text: text)
 //            self.allStickers.append(textSticker)
 //            self.setupAllStickers()
 //            textSticker.beginEditing()
@@ -63,7 +63,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 //        self.present(textViewEditVC, animated: true)
         
         SVGCanvasLoader.load(
-                svgNamed: "2",
+                svgNamed: "3",
                 into: stickerView,
                 stickers: &allStickers
             ){ sticker in
@@ -313,6 +313,26 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         wireStickerCallbacks(textSticker)
         
         return textSticker
+    }
+    
+    func createSvgTextSticker(text: String) -> SVGTextSticker {
+        let sticker = SVGTextSticker(frame: CGRect(x: stickerView.bounds.midX - 75 , y: stickerView.bounds.midY - 75, width: 150, height: 150))
+        
+        // Apply all extracted properties
+        sticker.text = text
+        sticker.fontSize = 24
+        sticker.fontName = nil
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
+        gesture.numberOfTapsRequired = 2
+        
+        sticker.isUserInteractionEnabled = true
+        sticker.addGestureRecognizer(gesture)
+        
+        // Wire selection and close callbacks so selecting one finishes others
+        wireStickerCallbacks(sticker)
+        
+        return sticker
     }
     
     
