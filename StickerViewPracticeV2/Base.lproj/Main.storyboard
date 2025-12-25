@@ -17,14 +17,71 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="diG-DP-hzV">
+                                <rect key="frame" x="8" y="125.99999999999999" width="105.66666666666667" height="43.333333333333329"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="43.329999999999998" id="RrL-24-zd5"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Add Image"/>
+                                <connections>
+                                    <action selector="addImageStickerAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3j3-l4-g9H"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yIA-WH-IwX">
+                                <rect key="frame" x="294" y="125.99999999999999" width="91" height="43.333333333333329"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="43.329999999999998" id="Q75-7J-pTw"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Add Text"/>
+                                <connections>
+                                    <action selector="addTextStickerAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="1zG-PJ-FWD"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kiL-T3-9RX">
+                                <rect key="frame" x="328" y="185.33333333333334" width="49" height="34.333333333333343"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrow.down.circle.fill" catalog="system"/>
+                                <connections>
+                                    <action selector="saveSvgAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vjf-FA-Ryk"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ttK-bL-byV">
+                                <rect key="frame" x="16" y="185.33333333333334" width="51" height="34.333333333333343"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34.329999999999998" id="NRz-eN-KUb"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.turn.up.backward.fill" catalog="system"/>
+                                <connections>
+                                    <action selector="undoAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="U7a-Hf-Rs3"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wJN-8g-Y51">
+                                <rect key="frame" x="124.66666666666669" y="185.33333333333334" width="51" height="34.333333333333343"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrowshape.turn.up.right.fill" catalog="system"/>
+                                <connections>
+                                    <action selector="redoAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="pxj-pt-tKr"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gTW-Mr-Okj">
+                                <rect key="frame" x="71" y="185.33333333333334" width="49.666666666666657" height="34.333333333333343"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="arrow.trianglehead.clockwise.rotate.90" catalog="system"/>
+                                <connections>
+                                    <action selector="resetCanvasAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="zgY-De-7ve"/>
+                                </connections>
+                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4J1-2P-ceN">
-                                <rect key="frame" x="16" y="226" width="361" height="400"/>
+                                <rect key="frame" x="16" y="235.66666666666666" width="361" height="386.33333333333337"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.5" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="canvas-bg" translatesAutoresizingMaskIntoConstraints="NO" id="ZEY-zY-gen">
-                                        <rect key="frame" x="0.0" y="0.0" width="361" height="400"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="361" height="386.33333333333331"/>
                                     </imageView>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XCm-Nw-kYj">
-                                        <rect key="frame" x="0.0" y="0.0" width="361" height="400"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="361" height="386.33333333333331"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </view>
                                 </subviews>
@@ -36,36 +93,18 @@
                                     <constraint firstAttribute="trailing" secondItem="ZEY-zY-gen" secondAttribute="trailing" id="7v3-Af-4H2"/>
                                     <constraint firstItem="ZEY-zY-gen" firstAttribute="top" secondItem="4J1-2P-ceN" secondAttribute="top" id="RZs-Gm-JWz"/>
                                     <constraint firstItem="XCm-Nw-kYj" firstAttribute="leading" secondItem="4J1-2P-ceN" secondAttribute="leading" id="Sv3-e2-Cof"/>
-                                    <constraint firstAttribute="height" constant="400" id="U22-4D-j0C"/>
                                     <constraint firstAttribute="bottom" secondItem="XCm-Nw-kYj" secondAttribute="bottom" id="hFN-TE-Ebf"/>
                                     <constraint firstAttribute="bottom" secondItem="ZEY-zY-gen" secondAttribute="bottom" id="kwx-5j-93p"/>
-                                    <constraint firstAttribute="width" constant="361" id="rT2-Jc-sUO"/>
                                 </constraints>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="diG-DP-hzV">
-                                <rect key="frame" x="8" y="125.99999999999999" width="105.66666666666667" height="43.333333333333329"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Add Image"/>
-                                <connections>
-                                    <action selector="addImageStickerAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3j3-l4-g9H"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yIA-WH-IwX">
-                                <rect key="frame" x="294" y="125.99999999999999" width="91" height="43.333333333333329"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Add Text"/>
-                                <connections>
-                                    <action selector="addTextStickerAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="1zG-PJ-FWD"/>
-                                </connections>
-                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yuP-Ug-LDW">
-                                <rect key="frame" x="12" y="692" width="369" height="60"/>
+                                <rect key="frame" x="12" y="682" width="369" height="70"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="h6C-nn-yzc">
-                                        <rect key="frame" x="0.0" y="0.0" width="369" height="60"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="369" height="70"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LBG-au-AOw">
-                                                <rect key="frame" x="0.0" y="12.666666666666629" width="42" height="35"/>
+                                                <rect key="frame" x="0.0" y="17.666666666666629" width="42" height="35"/>
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" image="bold" catalog="system"/>
                                                 <connections>
@@ -73,7 +112,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U4e-jW-oOj">
-                                                <rect key="frame" x="42" y="12.666666666666629" width="40.333333333333343" height="35"/>
+                                                <rect key="frame" x="42" y="17.666666666666629" width="40.333333333333343" height="35"/>
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" image="italic" catalog="system"/>
                                                 <connections>
@@ -81,7 +120,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B3L-ip-1L7">
-                                                <rect key="frame" x="82.333333333333329" y="8.3333333333333712" width="49.333333333333329" height="43.333333333333336"/>
+                                                <rect key="frame" x="82.333333333333329" y="13.333333333333375" width="49.333333333333329" height="43.333333333333343"/>
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" title="red">
                                                     <color key="baseForegroundColor" systemColor="systemRedColor"/>
@@ -91,7 +130,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ue0-OD-rcI">
-                                                <rect key="frame" x="131.66666666666666" y="8.3333333333333712" width="42" height="43.333333333333336"/>
+                                                <rect key="frame" x="131.66666666666666" y="13.333333333333375" width="42" height="43.333333333333343"/>
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" title="lbl">
                                                     <color key="baseForegroundColor" systemColor="labelColor"/>
@@ -101,7 +140,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JaN-oj-dn3">
-                                                <rect key="frame" x="173.66666666666666" y="8" width="61.666666666666657" height="44"/>
+                                                <rect key="frame" x="173.66666666666666" y="13" width="61.666666666666657" height="44"/>
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" title="font1"/>
                                                 <connections>
@@ -109,7 +148,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gnK-72-6e8">
-                                                <rect key="frame" x="235.33333333333334" y="8" width="64.333333333333343" height="44"/>
+                                                <rect key="frame" x="235.33333333333334" y="13" width="64.333333333333343" height="44"/>
                                                 <state key="normal" title="Button"/>
                                                 <buttonConfiguration key="configuration" style="plain" title="font2"/>
                                                 <connections>
@@ -150,7 +189,7 @@
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u7N-uj-DJf">
-                                        <rect key="frame" x="0.0" y="0.0" width="369" height="60"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="369" height="70"/>
                                         <subviews>
                                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="W9D-1v-gdO">
                                                 <rect key="frame" x="16" y="8" width="337" height="10"/>
@@ -202,35 +241,34 @@
                                     <constraint firstItem="h6C-nn-yzc" firstAttribute="leading" secondItem="yuP-Ug-LDW" secondAttribute="leading" id="VTQ-6o-OAu"/>
                                     <constraint firstAttribute="bottom" secondItem="h6C-nn-yzc" secondAttribute="bottom" id="XVD-wy-CIZ"/>
                                     <constraint firstItem="h6C-nn-yzc" firstAttribute="top" secondItem="yuP-Ug-LDW" secondAttribute="top" id="nrg-Qe-hc4"/>
-                                    <constraint firstAttribute="height" constant="60" id="o3O-Iq-Duy"/>
+                                    <constraint firstAttribute="height" constant="70" id="o3O-Iq-Duy"/>
                                     <constraint firstAttribute="trailing" secondItem="h6C-nn-yzc" secondAttribute="trailing" id="pkh-ix-9F0"/>
                                     <constraint firstItem="u7N-uj-DJf" firstAttribute="top" secondItem="yuP-Ug-LDW" secondAttribute="top" id="reD-18-g64"/>
                                 </constraints>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kiL-T3-9RX">
-                                <rect key="frame" x="328" y="175.66666666666666" width="49" height="34.333333333333343"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" image="arrow.down.circle.fill" catalog="system"/>
-                                <connections>
-                                    <action selector="saveSvgAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="vjf-FA-Ryk"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="4J1-2P-ceN" firstAttribute="top" secondItem="ttK-bL-byV" secondAttribute="bottom" constant="16" id="AC3-RS-D8w"/>
                             <constraint firstItem="diG-DP-hzV" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="Aik-UX-8Ms"/>
-                            <constraint firstItem="4J1-2P-ceN" firstAttribute="top" secondItem="kiL-T3-9RX" secondAttribute="bottom" constant="16" id="Ek5-ZM-gw8"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yIA-WH-IwX" secondAttribute="trailing" constant="8" id="HHT-zz-fc0"/>
+                            <constraint firstItem="wJN-8g-Y51" firstAttribute="leading" secondItem="gTW-Mr-Okj" secondAttribute="trailing" constant="4" id="JlK-jn-9Fg"/>
                             <constraint firstItem="4J1-2P-ceN" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="NRY-1R-XAq"/>
                             <constraint firstItem="yIA-WH-IwX" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="P8V-CK-mzh"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yuP-Ug-LDW" secondAttribute="trailing" constant="12" id="QQu-b8-fOR"/>
+                            <constraint firstItem="ttK-bL-byV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="RfJ-os-0PS"/>
                             <constraint firstItem="diG-DP-hzV" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="WKn-jG-suf"/>
-                            <constraint firstItem="4J1-2P-ceN" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="YyF-gH-mZy"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="4J1-2P-ceN" secondAttribute="trailing" constant="16" id="cST-sc-Hjq"/>
+                            <constraint firstItem="gTW-Mr-Okj" firstAttribute="leading" secondItem="ttK-bL-byV" secondAttribute="trailing" constant="4" id="dFP-wV-yxI"/>
+                            <constraint firstItem="kiL-T3-9RX" firstAttribute="top" secondItem="yIA-WH-IwX" secondAttribute="bottom" constant="16" id="hZO-jA-huY"/>
+                            <constraint firstItem="yuP-Ug-LDW" firstAttribute="top" secondItem="4J1-2P-ceN" secondAttribute="bottom" constant="60" id="lNu-i4-EBy"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="yuP-Ug-LDW" secondAttribute="bottom" constant="32" id="oU9-rz-Oku"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="kiL-T3-9RX" secondAttribute="trailing" constant="16" id="oly-Q1-kqs"/>
                             <constraint firstItem="yuP-Ug-LDW" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="12" id="s2n-Op-XfZ"/>
+                            <constraint firstItem="wJN-8g-Y51" firstAttribute="top" secondItem="gTW-Mr-Okj" secondAttribute="top" id="s4B-pY-dJD"/>
+                            <constraint firstItem="gTW-Mr-Okj" firstAttribute="top" secondItem="diG-DP-hzV" secondAttribute="bottom" constant="16" id="x4z-Bc-W3e"/>
+                            <constraint firstItem="ttK-bL-byV" firstAttribute="top" secondItem="diG-DP-hzV" secondAttribute="bottom" constant="16" id="xvR-7v-xng"/>
                         </constraints>
                     </view>
                     <connections>
@@ -240,11 +278,13 @@
                         <outlet property="italicBtn" destination="U4e-jW-oOj" id="OTz-hq-XFu"/>
                         <outlet property="labelColorBtn" destination="Ue0-OD-rcI" id="WRs-ff-dUA"/>
                         <outlet property="redColorBtn" destination="B3L-ip-1L7" id="dud-xx-I9E"/>
+                        <outlet property="redoBtn" destination="wJN-8g-Y51" id="sfb-Zz-jUl"/>
                         <outlet property="shadowSwitch" destination="KXY-iV-LyG" id="Rrh-RO-Uli"/>
                         <outlet property="stickerView" destination="XCm-Nw-kYj" id="DYy-YN-Lrx"/>
                         <outlet property="stickerViewContainer" destination="4J1-2P-ceN" id="eVK-gs-c3U"/>
                         <outlet property="stickersToolContainer" destination="yuP-Ug-LDW" id="kAk-eQ-t9A"/>
                         <outlet property="textToolsContainer" destination="h6C-nn-yzc" id="zOs-SH-nkf"/>
+                        <outlet property="undoBtn" destination="ttK-bL-byV" id="Vle-jH-rJz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -310,6 +350,9 @@
     </scenes>
     <resources>
         <image name="arrow.down.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="arrow.trianglehead.clockwise.rotate.90" catalog="system" width="128" height="119"/>
+        <image name="arrowshape.turn.up.backward.fill" catalog="system" width="128" height="104"/>
+        <image name="arrowshape.turn.up.right.fill" catalog="system" width="128" height="104"/>
         <image name="bold" catalog="system" width="128" height="128"/>
         <image name="canvas-bg" width="2500" height="2500"/>
         <image name="checkmark" catalog="system" width="128" height="114"/>

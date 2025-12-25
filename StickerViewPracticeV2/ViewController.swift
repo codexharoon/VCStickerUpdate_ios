@@ -25,6 +25,9 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBOutlet weak var labelColorBtn: UIButton!
     @IBOutlet weak var shadowSwitch: UISwitch!
     
+    @IBOutlet weak var undoBtn: UIButton!
+    @IBOutlet weak var redoBtn: UIButton!
+    
     var allStickers: [VCBaseSticker] = []
     
     var activeSticker: VCBaseSticker?
@@ -94,6 +97,21 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
     }
     
+    
+    // undo
+    
+    @IBAction func undoAction(_ sender: Any) {
+    }
+    
+    // redo
+    
+    @IBAction func redoAction(_ sender: Any) {
+    }
+    
+    // reset
+    
+    @IBAction func resetCanvasAction(_ sender: Any) {
+    }
     
     
     @IBAction func addImageStickerAction(_ sender: Any) {
