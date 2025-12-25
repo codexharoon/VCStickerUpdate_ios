@@ -38,6 +38,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         stickerViewContainer.layer.borderColor = UIColor.gray.cgColor
         stickerViewContainer.layer.borderWidth = 1.0
         stickerViewContainer.layer.cornerRadius = 20
+        stickerViewContainer.clipsToBounds = true
         
         stickersToolContainer.layer.borderColor = UIColor.gray.cgColor
         stickersToolContainer.layer.borderWidth = 1.0
