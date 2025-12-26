@@ -32,6 +32,9 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     var activeSticker: VCBaseSticker?
     
+    // Undo/Redo Manager
+    private let canvasUndoManager = CanvasUndoManager()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -48,6 +51,75 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         stickersToolContainer.layer.cornerRadius = 20
         
         stickerToolsContainerIsHidden(true)
+        
+        // Setup undo manager
+        setupUndoManager()
+    }
+    
+    
+    // MARK: - Undo Manager Setup
+    
+    private func setupUndoManager() {
+        canvasUndoManager.canvasView = stickerView
+        
+        canvasUndoManager.addSticker = { [weak self] sticker in
+            self?.allStickers.append(sticker)
+        }
+        
+        canvasUndoManager.insertSticker = { [weak self] sticker, index in
+            guard let self = self else { return }
+            // Insert at specific index, clamping to valid range
+            let safeIndex = min(index, self.allStickers.count)
+            self.allStickers.insert(sticker, at: safeIndex)
+        }
+        
+        canvasUndoManager.removeSticker = { [weak self] sticker in
+            if let idx = self?.allStickers.firstIndex(where: { $0 === sticker }) {
+                self?.allStickers.remove(at: idx)
+            }
+        }
+        
+        canvasUndoManager.getArrayIndex = { [weak self] sticker in
+            return self?.allStickers.firstIndex(where: { $0 === sticker })
+        }
+        
+        // Wire sticker callbacks when restoring from undo
+        canvasUndoManager.wireSticker = { [weak self] sticker in
+            self?.wireStickerCallbacks(sticker)
+        }
+        
+        // Focus sticker after undo/redo operations
+        canvasUndoManager.selectSticker = { [weak self] sticker in
+            guard let self = self else { return }
+            
+            // Finish editing on all stickers first
+            for other in self.allStickers {
+                other.finishEditing()
+            }
+            
+            // Set the active sticker and begin editing
+            self.activeSticker = sticker
+            if let sticker = sticker {
+                sticker.beginEditing()
+            }
+            self.handleToolsForActiveSticker()
+        }
+        
+        canvasUndoManager.onUndoRedoStateChanged = { [weak self] in
+            self?.updateUndoRedoButtons()
+        }
+        
+        // Initial button state
+        updateUndoRedoButtons()
+    }
+    
+    private func updateUndoRedoButtons() {
+        undoBtn.isEnabled = canvasUndoManager.canUndo
+        redoBtn.isEnabled = canvasUndoManager.canRedo
+        
+        // Visual feedback for disabled state
+        undoBtn.alpha = canvasUndoManager.canUndo ? 1.0 : 0.5
+        redoBtn.alpha = canvasUndoManager.canRedo ? 1.0 : 0.5
     }
     
     
@@ -72,6 +144,9 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
                 stickers: &allStickers
             ){ sticker in
                 self.wireStickerCallbacks(sticker)
+                
+                // NOTE: Initial SVG load is NOT registered for undo
+                // Undo/redo only applies to user changes (move, edit, delete, add new)
                 
                 // Add double-tap gesture for text editing on SVG text stickers
                 if sticker is SVGTextSticker {
@@ -101,16 +176,26 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     // undo
     
     @IBAction func undoAction(_ sender: Any) {
+        canvasUndoManager.undo()
     }
     
     // redo
     
     @IBAction func redoAction(_ sender: Any) {
+        canvasUndoManager.redo()
     }
     
     // reset
     
     @IBAction func resetCanvasAction(_ sender: Any) {
+        // Remove all stickers
+        for sticker in allStickers {
+            sticker.removeFromSuperview()
+        }
+        allStickers.removeAll()
+        activeSticker = nil
+        canvasUndoManager.clearAll()
+        stickerToolsContainerIsHidden(true)
     }
     
     
@@ -130,54 +215,142 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     @IBAction func boldAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
+            let oldValue = sticker.stickerIsBold
             sticker.stickerIsBold = !sticker.stickerIsBold
+            let newValue = sticker.stickerIsBold
+            canvasUndoManager.registerChange(
+                for: sticker,
+                undo: { sticker.stickerIsBold = oldValue },
+                redo: { sticker.stickerIsBold = newValue },
+                actionName: "Bold"
+            )
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            let oldValue = svgTextSticker.isBold
             svgTextSticker.isBold = !svgTextSticker.isBold
+            let newValue = svgTextSticker.isBold
+            canvasUndoManager.registerChange(
+                for: svgTextSticker,
+                undo: { svgTextSticker.isBold = oldValue },
+                redo: { svgTextSticker.isBold = newValue },
+                actionName: "Bold"
+            )
         }
     }
     
     
     @IBAction func italicAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
+            let oldValue = sticker.stickerIsItalic
             sticker.stickerIsItalic = !sticker.stickerIsItalic
+            let newValue = sticker.stickerIsItalic
+            canvasUndoManager.registerChange(
+                for: sticker,
+                undo: { sticker.stickerIsItalic = oldValue },
+                redo: { sticker.stickerIsItalic = newValue },
+                actionName: "Italic"
+            )
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            let oldValue = svgTextSticker.isItalic
             svgTextSticker.isItalic = !svgTextSticker.isItalic
+            let newValue = svgTextSticker.isItalic
+            canvasUndoManager.registerChange(
+                for: svgTextSticker,
+                undo: { svgTextSticker.isItalic = oldValue },
+                redo: { svgTextSticker.isItalic = newValue },
+                actionName: "Italic"
+            )
         }
     }
     
     
     @IBAction func redColorAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
+            let oldValue = sticker.stickerTextColor
             sticker.stickerTextColor = .systemRed
+            canvasUndoManager.registerChange(
+                for: sticker,
+                undo: { sticker.stickerTextColor = oldValue },
+                redo: { sticker.stickerTextColor = .systemRed },
+                actionName: "Text Color"
+            )
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            let oldValue = svgTextSticker.textColor
             svgTextSticker.textColor = .systemRed
+            canvasUndoManager.registerChange(
+                for: svgTextSticker,
+                undo: { svgTextSticker.textColor = oldValue },
+                redo: { svgTextSticker.textColor = .systemRed },
+                actionName: "Text Color"
+            )
         }
     }
     
     
     @IBAction func labelColorBtnAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
+            let oldValue = sticker.stickerTextColor
             sticker.stickerTextColor = .label
+            canvasUndoManager.registerChange(
+                for: sticker,
+                undo: { sticker.stickerTextColor = oldValue },
+                redo: { sticker.stickerTextColor = .label },
+                actionName: "Text Color"
+            )
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            let oldValue = svgTextSticker.textColor
             svgTextSticker.textColor = .label
+            canvasUndoManager.registerChange(
+                for: svgTextSticker,
+                undo: { svgTextSticker.textColor = oldValue },
+                redo: { svgTextSticker.textColor = .label },
+                actionName: "Text Color"
+            )
         }
     }
     
     
     @IBAction func font1Action(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
+            let oldValue = sticker.stickerFontName
             sticker.stickerFontName = "Georgia"
+            canvasUndoManager.registerChange(
+                for: sticker,
+                undo: { sticker.stickerFontName = oldValue },
+                redo: { sticker.stickerFontName = "Georgia" },
+                actionName: "Font"
+            )
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            let oldValue = svgTextSticker.fontName
             svgTextSticker.fontName = "Georgia"
+            canvasUndoManager.registerChange(
+                for: svgTextSticker,
+                undo: { svgTextSticker.fontName = oldValue },
+                redo: { svgTextSticker.fontName = "Georgia" },
+                actionName: "Font"
+            )
         }
     }
     
     
     @IBAction func font2Action(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
+            let oldValue = sticker.stickerFontName
             sticker.stickerFontName = "NewYork-Regular"
+            canvasUndoManager.registerChange(
+                for: sticker,
+                undo: { sticker.stickerFontName = oldValue },
+                redo: { sticker.stickerFontName = "NewYork-Regular" },
+                actionName: "Font"
+            )
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
+            let oldValue = svgTextSticker.fontName
             svgTextSticker.fontName = "NewYork-Regular"
+            canvasUndoManager.registerChange(
+                for: svgTextSticker,
+                undo: { svgTextSticker.fontName = oldValue },
+                redo: { svgTextSticker.fontName = "NewYork-Regular" },
+                actionName: "Font"
+            )
         }
     }
     
@@ -227,10 +400,32 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     @IBAction func imgRedBtn(_ sender: Any) {
         if let imageSticker = self.activeSticker as? VCImageSticker {
+            let oldTint = imageSticker.imageView.tintColor
+            let oldImage = imageSticker.imageView.image
             imageSticker.imageView.tintColor = .systemRed
             imageSticker.imageView.image = imageSticker.imageView.image?.withRenderingMode(.alwaysTemplate)
+            let newImage = imageSticker.imageView.image
+            canvasUndoManager.registerChange(
+                for: imageSticker,
+                undo: {
+                    imageSticker.imageView.tintColor = oldTint
+                    imageSticker.imageView.image = oldImage
+                },
+                redo: {
+                    imageSticker.imageView.tintColor = .systemRed
+                    imageSticker.imageView.image = newImage
+                },
+                actionName: "Image Tint"
+            )
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            let oldTint = svgImageSticker.currentTintColor
             svgImageSticker.applyTint(.systemRed)
+            canvasUndoManager.registerChange(
+                for: svgImageSticker,
+                undo: { svgImageSticker.applyTint(oldTint) },
+                redo: { svgImageSticker.applyTint(.systemRed) },
+                actionName: "Image Tint"
+            )
         }
     }
     
@@ -238,10 +433,32 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBAction func imgLabelBtn(_ sender: Any) {
         // Reset to original colors
         if let imageSticker = self.activeSticker as? VCImageSticker {
+            let oldTint = imageSticker.imageView.tintColor
+            let oldImage = imageSticker.imageView.image
             imageSticker.imageView.tintColor = nil
             imageSticker.imageView.image = imageSticker.imageView.image?.withRenderingMode(.alwaysOriginal)
+            let newImage = imageSticker.imageView.image
+            canvasUndoManager.registerChange(
+                for: imageSticker,
+                undo: {
+                    imageSticker.imageView.tintColor = oldTint
+                    imageSticker.imageView.image = oldImage
+                },
+                redo: {
+                    imageSticker.imageView.tintColor = nil
+                    imageSticker.imageView.image = newImage
+                },
+                actionName: "Image Tint"
+            )
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            let oldTint = svgImageSticker.currentTintColor
             svgImageSticker.applyTint(nil)  // Reset to original
+            canvasUndoManager.registerChange(
+                for: svgImageSticker,
+                undo: { svgImageSticker.applyTint(oldTint) },
+                redo: { svgImageSticker.applyTint(nil) },
+                actionName: "Image Tint"
+            )
         }
     }
     
@@ -396,13 +613,26 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         sticker.onClose = { [weak self, weak sticker] in
             guard let self = self, let s = sticker else { return }
+            
+            // Register undo for delete BEFORE removing
+            self.canvasUndoManager.registerRemoveSticker(s)
+            
             // Remove from our tracking array when closed
             if let idx = self.allStickers.firstIndex(where: { $0 === s }) {
                 self.allStickers.remove(at: idx)
             }
             
+            // Remove from view (VCBaseSticker no longer auto-removes when onClose is set)
+            s.removeFromSuperview()
+            
             self.activeSticker = nil
             self.handleToolsForActiveSticker()
+        }
+        
+        // Register transform changes for undo
+        sticker.onTransformEnded = { [weak self, weak sticker] oldTransform, oldCenter in
+            guard let self = self, let s = sticker else { return }
+            self.canvasUndoManager.registerTransformChange(for: s, from: oldTransform, oldCenter: oldCenter)
         }
     }
     
@@ -468,8 +698,11 @@ extension ViewController {
                         DispatchQueue.main.async {
                             let sticker = self.createImageSticker(image: selectedImage)
                             self.allStickers.append(sticker)
+                            self.stickerView.addSubview(sticker)
                             
-                            self.setupAllStickers()
+                            // Register for undo (user-added sticker should be undoable)
+                            self.canvasUndoManager.registerAddSticker(sticker)
+                            
                             sticker.beginEditing()
                         }
                     }

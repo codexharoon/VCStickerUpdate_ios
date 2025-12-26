@@ -24,6 +24,10 @@ open class VCBaseSticker: UIView {
     @objc public var onFinishEditing: (() -> Void)?
     @objc public var onClose: (() -> Void)?
     
+    // Transform tracking for undo/redo
+    public var onTransformBegan: ((CGAffineTransform, CGPoint) -> Void)?
+    public var onTransformEnded: ((CGAffineTransform, CGPoint) -> Void)?
+    
     var closeImage  = VCAsserts.closeImage
     // Reuse resizeImage for both rotate and resize icons for now.
     var resizeImage = VCAsserts.resizeImage
@@ -56,6 +60,10 @@ open class VCBaseSticker: UIView {
     /// 记录缩放/旋转的开始时的状态
     private var lastAngle: CGFloat!
     private var lastDistance: CGFloat!
+    
+    // For undo/redo: capture state at gesture start
+    private var transformAtGestureStart: CGAffineTransform?
+    private var centerAtGestureStart: CGPoint?
     
     private lazy var border: CAShapeLayer = {       // 外边框
         let layer = CAShapeLayer()
@@ -246,6 +254,13 @@ extension VCBaseSticker {
             beginEditing()
         }
         
+        // Capture initial state for undo
+        if gesture.state == .began {
+            transformAtGestureStart = self.transform
+            centerAtGestureStart = self.center
+            onTransformBegan?(self.transform, self.center)
+        }
+        
         // 1.获取手势在视图上的平移增量
         let translation = gesture.translation(in: gesture.view!.superview)
         // 2.设置中心点
@@ -268,6 +283,16 @@ extension VCBaseSticker {
         
         // 3.将上一次的平移增量置为0
         gesture.setTranslation(CGPoint(x: 0.0, y: 0.0), in: gesture.view)
+        
+        // Fire callback at gesture end for undo registration
+        if gesture.state == .ended || gesture.state == .cancelled {
+            if let oldTransform = transformAtGestureStart,
+               let oldCenter = centerAtGestureStart {
+                onTransformEnded?(oldTransform, oldCenter)
+            }
+            transformAtGestureStart = nil
+            centerAtGestureStart = nil
+        }
     }
     
     /// 旋转控制（底部右侧按钮）
@@ -280,6 +305,9 @@ extension VCBaseSticker {
         
         if gesture.state == .began {
             self.lastAngle = angle
+            transformAtGestureStart = self.transform
+            centerAtGestureStart = self.center
+            onTransformBegan?(self.transform, self.center)
         } else if gesture.state == .changed {
             // 旋转
             let delta = angle - self.lastAngle
@@ -288,6 +316,13 @@ extension VCBaseSticker {
             
             // Trigger layout update to recalculate inverse scale for buttons
             setNeedsLayout()
+        } else if gesture.state == .ended || gesture.state == .cancelled {
+            if let oldTransform = transformAtGestureStart,
+               let oldCenter = centerAtGestureStart {
+                onTransformEnded?(oldTransform, oldCenter)
+            }
+            transformAtGestureStart = nil
+            centerAtGestureStart = nil
         }
     }
     
@@ -301,6 +336,9 @@ extension VCBaseSticker {
         
         if gesture.state == .began {
             self.lastDistance = distance
+            transformAtGestureStart = self.transform
+            centerAtGestureStart = self.center
+            onTransformBegan?(self.transform, self.center)
         } else if gesture.state == .changed {
             // Calculate scale factor relative to last distance
             let scaleFactor = distance / self.lastDistance
@@ -311,18 +349,30 @@ extension VCBaseSticker {
             
             // Trigger layout update to recalculate inverse scale for buttons
             setNeedsLayout()
+        } else if gesture.state == .ended || gesture.state == .cancelled {
+            if let oldTransform = transformAtGestureStart,
+               let oldCenter = centerAtGestureStart {
+                onTransformEnded?(oldTransform, oldCenter)
+            }
+            transformAtGestureStart = nil
+            centerAtGestureStart = nil
         }
     }
     
     /// 点击关闭
     @objc func handleTapClose() {
         self.onClose?()
-        self.removeFromSuperview()
+        // NOTE: removeFromSuperview is now handled by the onClose callback
+        // This allows undo manager to control the sticker lifecycle
+        // If no onClose is set, we still remove from superview for safety
+        if self.onClose == nil {
+            self.removeFromSuperview()
+        }
     }
     
     /// 点击当前控件整体（显示/隐藏）
     @objc func handleTapBody() {
         isEditing ? finishEditing() : beginEditing()
     }
+    
 }
-

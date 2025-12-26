@@ -118,6 +118,11 @@ public final class SVGImageSticker: VCBaseSticker {
         self.shapeTintColor = color
     }
     
+    /// Get current tint color (for undo support)
+    public var currentTintColor: UIColor? {
+        return shapeTintColor
+    }
+    
     /// Reset to original appearance
     public func resetAppearance() {
         self.imageOpacity = 1.0
