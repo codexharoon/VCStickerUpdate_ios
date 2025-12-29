@@ -28,12 +28,19 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBOutlet weak var undoBtn: UIButton!
     @IBOutlet weak var redoBtn: UIButton!
     
+    @IBOutlet weak var layerBtn: UIButton!
+    @IBOutlet weak var layerContainer: UIView!
+    @IBOutlet weak var layerContainerWidth: NSLayoutConstraint!
+    @IBOutlet weak var layerTableView: UITableView!
+    
     var allStickers: [VCBaseSticker] = []
     
     var activeSticker: VCBaseSticker?
     
     // Undo/Redo Manager
     private let canvasUndoManager = CanvasUndoManager()
+    
+    var isLayerVisible = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +60,9 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         stickerToolsContainerIsHidden(true)
         
         imgOpacitySlider.isContinuous = false
+        
+        layerContainerWidth.constant = 0
+        setupLayerTableView()
         
         // Setup undo manager
         setupUndoManager()
@@ -126,6 +136,25 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     
+    @IBAction func layerBtnAction(_ sender: Any) {
+        isLayerVisible.toggle()
+        layerTableView.reloadData()
+        
+        let width: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 300 : 150
+
+        layerContainerWidth.constant = isLayerVisible ? width : 0
+
+        UIView.animate(withDuration: 0.3,
+                       delay: 0,
+                       usingSpringWithDamping: 0.9,
+                       initialSpringVelocity: 0.5,
+                       options: .curveEaseInOut,
+                       animations: {
+            self.view.layoutIfNeeded()
+        })
+    }
+    
+    
     @IBAction func addTextStickerAction(_ sender: Any) {
 //        let textViewEditVC = self.getTextViewEditorVC()
 //        
@@ -158,6 +187,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
                     sticker.addGestureRecognizer(gesture)
                 }
         }
+        
+        layerTableView.reloadData()
         
     }
     
