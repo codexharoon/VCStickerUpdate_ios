@@ -100,6 +100,50 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yuP-Ug-LDW">
                                 <rect key="frame" x="12" y="682" width="369" height="70"/>
                                 <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u7N-uj-DJf">
+                                        <rect key="frame" x="0.0" y="0.0" width="369" height="70"/>
+                                        <subviews>
+                                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="W9D-1v-gdO">
+                                                <rect key="frame" x="16" y="12" width="337" height="10"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="10" id="XeN-53-Dnm"/>
+                                                </constraints>
+                                                <connections>
+                                                    <action selector="imgOpacitySliderAction:" destination="BYZ-38-t0r" eventType="valueChanged" id="QIi-u1-q2u"/>
+                                                </connections>
+                                            </slider>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UvT-Vw-rEv">
+                                                <rect key="frame" x="8" y="24" width="54" height="44"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Red">
+                                                    <color key="baseForegroundColor" systemColor="systemRedColor"/>
+                                                </buttonConfiguration>
+                                                <connections>
+                                                    <action selector="imgRedBtn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="CZF-DO-QFm"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DoB-pK-dCG">
+                                                <rect key="frame" x="70" y="24" width="43.666666666666657" height="44"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="og">
+                                                    <color key="baseForegroundColor" systemColor="labelColor"/>
+                                                </buttonConfiguration>
+                                                <connections>
+                                                    <action selector="imgLabelBtn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kuf-cP-8TR"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="W9D-1v-gdO" secondAttribute="trailing" constant="16" id="4i4-6W-cDa"/>
+                                            <constraint firstItem="DoB-pK-dCG" firstAttribute="top" secondItem="W9D-1v-gdO" secondAttribute="bottom" constant="2" id="9uk-eT-SLb"/>
+                                            <constraint firstItem="UvT-Vw-rEv" firstAttribute="top" secondItem="W9D-1v-gdO" secondAttribute="bottom" constant="2" id="Cxi-fq-wsp"/>
+                                            <constraint firstItem="DoB-pK-dCG" firstAttribute="leading" secondItem="UvT-Vw-rEv" secondAttribute="trailing" constant="8" id="Dfd-tl-gbm"/>
+                                            <constraint firstItem="W9D-1v-gdO" firstAttribute="leading" secondItem="u7N-uj-DJf" secondAttribute="leading" constant="16" id="Gv8-z0-1gg"/>
+                                            <constraint firstItem="UvT-Vw-rEv" firstAttribute="leading" secondItem="u7N-uj-DJf" secondAttribute="leading" constant="8" id="PJz-po-GDM"/>
+                                            <constraint firstItem="W9D-1v-gdO" firstAttribute="top" secondItem="u7N-uj-DJf" secondAttribute="top" constant="12" id="i5C-nF-Mx8"/>
+                                        </constraints>
+                                    </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="h6C-nn-yzc">
                                         <rect key="frame" x="0.0" y="0.0" width="369" height="70"/>
                                         <subviews>
@@ -186,50 +230,6 @@
                                             <constraint firstAttribute="trailing" secondItem="Qzr-cP-yIz" secondAttribute="trailing" constant="8" id="oO1-3v-nJu"/>
                                             <constraint firstItem="gnK-72-6e8" firstAttribute="leading" secondItem="JaN-oj-dn3" secondAttribute="trailing" id="ozY-1s-Nha"/>
                                             <constraint firstItem="gnK-72-6e8" firstAttribute="centerY" secondItem="h6C-nn-yzc" secondAttribute="centerY" id="y5Z-bB-U0a"/>
-                                        </constraints>
-                                    </view>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u7N-uj-DJf">
-                                        <rect key="frame" x="0.0" y="0.0" width="369" height="70"/>
-                                        <subviews>
-                                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="W9D-1v-gdO">
-                                                <rect key="frame" x="16" y="8" width="337" height="10"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="10" id="XeN-53-Dnm"/>
-                                                </constraints>
-                                                <connections>
-                                                    <action selector="imgOpacitySliderAction:" destination="BYZ-38-t0r" eventType="valueChanged" id="QIi-u1-q2u"/>
-                                                </connections>
-                                            </slider>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UvT-Vw-rEv">
-                                                <rect key="frame" x="8" y="20" width="54" height="44"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="Red">
-                                                    <color key="baseForegroundColor" systemColor="systemRedColor"/>
-                                                </buttonConfiguration>
-                                                <connections>
-                                                    <action selector="imgRedBtn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="CZF-DO-QFm"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DoB-pK-dCG">
-                                                <rect key="frame" x="70" y="20" width="43.666666666666657" height="44"/>
-                                                <state key="normal" title="Button"/>
-                                                <buttonConfiguration key="configuration" style="plain" title="og">
-                                                    <color key="baseForegroundColor" systemColor="labelColor"/>
-                                                </buttonConfiguration>
-                                                <connections>
-                                                    <action selector="imgLabelBtn:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kuf-cP-8TR"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <constraints>
-                                            <constraint firstAttribute="trailing" secondItem="W9D-1v-gdO" secondAttribute="trailing" constant="16" id="4i4-6W-cDa"/>
-                                            <constraint firstItem="DoB-pK-dCG" firstAttribute="top" secondItem="W9D-1v-gdO" secondAttribute="bottom" constant="2" id="9uk-eT-SLb"/>
-                                            <constraint firstItem="UvT-Vw-rEv" firstAttribute="top" secondItem="W9D-1v-gdO" secondAttribute="bottom" constant="2" id="Cxi-fq-wsp"/>
-                                            <constraint firstItem="DoB-pK-dCG" firstAttribute="leading" secondItem="UvT-Vw-rEv" secondAttribute="trailing" constant="8" id="Dfd-tl-gbm"/>
-                                            <constraint firstItem="W9D-1v-gdO" firstAttribute="leading" secondItem="u7N-uj-DJf" secondAttribute="leading" constant="16" id="Gv8-z0-1gg"/>
-                                            <constraint firstItem="UvT-Vw-rEv" firstAttribute="leading" secondItem="u7N-uj-DJf" secondAttribute="leading" constant="8" id="PJz-po-GDM"/>
-                                            <constraint firstItem="W9D-1v-gdO" firstAttribute="top" secondItem="u7N-uj-DJf" secondAttribute="top" constant="8" id="i5C-nF-Mx8"/>
                                         </constraints>
                                     </view>
                                 </subviews>

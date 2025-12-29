@@ -52,6 +52,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         stickerToolsContainerIsHidden(true)
         
+        imgOpacitySlider.isContinuous = false
+        
         // Setup undo manager
         setupUndoManager()
     }
@@ -376,7 +378,25 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 //                    blur: 8,
 //                    opacity: 0.34
 //                )
+                
+//                let oldStrokeColor = svgTextSticker.strokeColor
+//                let oldStrokeWidth = svgTextSticker.strokeWidth
+                
                 svgTextSticker.applyStroke(color: .white, width: 6)
+                
+                let newStrokeColor = svgTextSticker.strokeColor
+                let newStrokeWidth = svgTextSticker.strokeWidth
+                
+                canvasUndoManager.registerChange(
+                    undo: {
+                        svgTextSticker.removeStroke()
+                    },
+                    redo: {
+                        svgTextSticker.applyStroke(color: newStrokeColor, width: newStrokeWidth)
+                    },
+                    actionName: "Stroke"
+                )
+                
             } else {
 //                svgTextSticker.removeShadow()
                 svgTextSticker.removeStroke()
@@ -389,11 +409,21 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     @IBAction func imgOpacitySliderAction(_ sender: UISlider) {
         let opacity = sender.value  // 0.0 to 1.0
-        
         if let imageSticker = self.activeSticker as? VCImageSticker {
             imageSticker.imageView.alpha = CGFloat(opacity)
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            let old = svgImageSticker.imageOpacity
             svgImageSticker.imageOpacity = opacity
+            let new = svgImageSticker.imageOpacity
+            
+            canvasUndoManager.registerChange(undo: {
+                svgImageSticker.imageOpacity = old
+                sender.value = old
+            }, redo: {
+                svgImageSticker.imageOpacity = new
+                sender.value = new
+            }, actionName: "Image Opacity")
+            
         }
     }
     
@@ -656,7 +686,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             imagesToolsContainer.isHidden = true
             textToolsContainer.isHidden = false
             
-            shadowSwitch.isOn = svgTextSticker.textShadowEnabled
+            shadowSwitch.isOn = svgTextSticker.strokeEnabled
         }
         else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             // Show image tools for SVG shape stickers
