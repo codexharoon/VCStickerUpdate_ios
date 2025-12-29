@@ -129,7 +129,11 @@ public final class SVGTextSticker: VCBaseSticker {
             attributes[.strokeWidth] = -strokeWidth
         }
         
+        // Disable implicit animations to prevent ghosting/duplication during snapshot
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
         textLayer.string = NSAttributedString(string: text, attributes: attributes)
+        CATransaction.commit()
     }
     
     /// Update text layer and resize sticker to fit the new text

@@ -37,8 +37,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     var activeSticker: VCBaseSticker?
     
-    // Undo/Redo Manager
-    private let canvasUndoManager = CanvasUndoManager()
+    // Undo/Redo Manager (internal so extensions can register layer changes)
+    let canvasUndoManager = CanvasUndoManager()
     
     var isLayerVisible = false
     
@@ -121,9 +121,28 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             self?.updateUndoRedoButtons()
         }
         
+        // Layer synchronization callbacks
+        canvasUndoManager.onLayersChanged = { [weak self] in
+            self?.layerTableView.reloadData()
+        }
+        
+        canvasUndoManager.reorderStickers = { [weak self] fromIndex, toIndex in
+            guard let self = self else { return }
+            guard fromIndex >= 0 && fromIndex < self.allStickers.count else { return }
+            
+            let sticker = self.allStickers.remove(at: fromIndex)
+            let safeToIndex = min(toIndex, self.allStickers.count)
+            self.allStickers.insert(sticker, at: safeToIndex)
+        }
+        
+        canvasUndoManager.updateStickerZOrder = { [weak self] in
+            self?.setupAllStickers()
+        }
+        
         // Initial button state
         updateUndoRedoButtons()
     }
+
     
     private func updateUndoRedoButtons() {
         undoBtn.isEnabled = canvasUndoManager.canUndo
@@ -253,20 +272,34 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             let newValue = sticker.stickerIsBold
             canvasUndoManager.registerChange(
                 for: sticker,
-                undo: { sticker.stickerIsBold = oldValue },
-                redo: { sticker.stickerIsBold = newValue },
+                undo: { [weak self] in
+                    sticker.stickerIsBold = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    sticker.stickerIsBold = newValue
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Bold"
             )
+            refreshLayerPanel()
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             let oldValue = svgTextSticker.isBold
             svgTextSticker.isBold = !svgTextSticker.isBold
             let newValue = svgTextSticker.isBold
             canvasUndoManager.registerChange(
                 for: svgTextSticker,
-                undo: { svgTextSticker.isBold = oldValue },
-                redo: { svgTextSticker.isBold = newValue },
+                undo: { [weak self] in
+                    svgTextSticker.isBold = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgTextSticker.isBold = newValue
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Bold"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -278,20 +311,34 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             let newValue = sticker.stickerIsItalic
             canvasUndoManager.registerChange(
                 for: sticker,
-                undo: { sticker.stickerIsItalic = oldValue },
-                redo: { sticker.stickerIsItalic = newValue },
+                undo: { [weak self] in
+                    sticker.stickerIsItalic = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    sticker.stickerIsItalic = newValue
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Italic"
             )
+            refreshLayerPanel()
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             let oldValue = svgTextSticker.isItalic
             svgTextSticker.isItalic = !svgTextSticker.isItalic
             let newValue = svgTextSticker.isItalic
             canvasUndoManager.registerChange(
                 for: svgTextSticker,
-                undo: { svgTextSticker.isItalic = oldValue },
-                redo: { svgTextSticker.isItalic = newValue },
+                undo: { [weak self] in
+                    svgTextSticker.isItalic = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgTextSticker.isItalic = newValue
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Italic"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -302,19 +349,33 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             sticker.stickerTextColor = .systemRed
             canvasUndoManager.registerChange(
                 for: sticker,
-                undo: { sticker.stickerTextColor = oldValue },
-                redo: { sticker.stickerTextColor = .systemRed },
+                undo: { [weak self] in
+                    sticker.stickerTextColor = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    sticker.stickerTextColor = .systemRed
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Text Color"
             )
+            refreshLayerPanel()
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             let oldValue = svgTextSticker.textColor
             svgTextSticker.textColor = .systemRed
             canvasUndoManager.registerChange(
                 for: svgTextSticker,
-                undo: { svgTextSticker.textColor = oldValue },
-                redo: { svgTextSticker.textColor = .systemRed },
+                undo: { [weak self] in
+                    svgTextSticker.textColor = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgTextSticker.textColor = .systemRed
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Text Color"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -325,19 +386,33 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             sticker.stickerTextColor = .label
             canvasUndoManager.registerChange(
                 for: sticker,
-                undo: { sticker.stickerTextColor = oldValue },
-                redo: { sticker.stickerTextColor = .label },
+                undo: { [weak self] in
+                    sticker.stickerTextColor = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    sticker.stickerTextColor = .label
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Text Color"
             )
+            refreshLayerPanel()
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             let oldValue = svgTextSticker.textColor
-            svgTextSticker.textColor = .label
+            svgTextSticker.textColor = .black
             canvasUndoManager.registerChange(
                 for: svgTextSticker,
-                undo: { svgTextSticker.textColor = oldValue },
-                redo: { svgTextSticker.textColor = .label },
+                undo: { [weak self] in
+                    svgTextSticker.textColor = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgTextSticker.textColor = .black
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Text Color"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -348,19 +423,33 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             sticker.stickerFontName = "Georgia"
             canvasUndoManager.registerChange(
                 for: sticker,
-                undo: { sticker.stickerFontName = oldValue },
-                redo: { sticker.stickerFontName = "Georgia" },
+                undo: { [weak self] in
+                    sticker.stickerFontName = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    sticker.stickerFontName = "Georgia"
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Font"
             )
+            refreshLayerPanel()
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             let oldValue = svgTextSticker.fontName
             svgTextSticker.fontName = "Georgia"
             canvasUndoManager.registerChange(
                 for: svgTextSticker,
-                undo: { svgTextSticker.fontName = oldValue },
-                redo: { svgTextSticker.fontName = "Georgia" },
+                undo: { [weak self] in
+                    svgTextSticker.fontName = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgTextSticker.fontName = "Georgia"
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Font"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -371,19 +460,33 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             sticker.stickerFontName = "NewYork-Regular"
             canvasUndoManager.registerChange(
                 for: sticker,
-                undo: { sticker.stickerFontName = oldValue },
-                redo: { sticker.stickerFontName = "NewYork-Regular" },
+                undo: { [weak self] in
+                    sticker.stickerFontName = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    sticker.stickerFontName = "NewYork-Regular"
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Font"
             )
+            refreshLayerPanel()
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             let oldValue = svgTextSticker.fontName
             svgTextSticker.fontName = "NewYork-Regular"
             canvasUndoManager.registerChange(
                 for: svgTextSticker,
-                undo: { svgTextSticker.fontName = oldValue },
-                redo: { svgTextSticker.fontName = "NewYork-Regular" },
+                undo: { [weak self] in
+                    svgTextSticker.fontName = oldValue
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgTextSticker.fontName = "NewYork-Regular"
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Font"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -401,37 +504,30 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             else{
                 sticker.shadowEnable = false
             }
+            refreshLayerPanel()
         } else if let svgTextSticker = self.activeSticker as? SVGTextSticker {
             if sender.isOn {
-//                svgTextSticker.applyShadow(
-//                    color: .black,
-//                    offset: CGSize(width: 0, height: 4),
-//                    blur: 8,
-//                    opacity: 0.34
-//                )
-                
-//                let oldStrokeColor = svgTextSticker.strokeColor
-//                let oldStrokeWidth = svgTextSticker.strokeWidth
-                
                 svgTextSticker.applyStroke(color: .white, width: 6)
                 
                 let newStrokeColor = svgTextSticker.strokeColor
                 let newStrokeWidth = svgTextSticker.strokeWidth
                 
                 canvasUndoManager.registerChange(
-                    undo: {
+                    undo: { [weak self] in
                         svgTextSticker.removeStroke()
+                        self?.refreshLayerPanel()
                     },
-                    redo: {
+                    redo: { [weak self] in
                         svgTextSticker.applyStroke(color: newStrokeColor, width: newStrokeWidth)
+                        self?.refreshLayerPanel()
                     },
                     actionName: "Stroke"
                 )
                 
             } else {
-//                svgTextSticker.removeShadow()
                 svgTextSticker.removeStroke()
             }
+            refreshLayerPanel()
         }
     }
     
@@ -442,19 +538,23 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         let opacity = sender.value  // 0.0 to 1.0
         if let imageSticker = self.activeSticker as? VCImageSticker {
             imageSticker.imageView.alpha = CGFloat(opacity)
+            refreshLayerPanel()
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             let old = svgImageSticker.imageOpacity
             svgImageSticker.imageOpacity = opacity
             let new = svgImageSticker.imageOpacity
             
-            canvasUndoManager.registerChange(undo: {
+            canvasUndoManager.registerChange(undo: { [weak self] in
                 svgImageSticker.imageOpacity = old
                 sender.value = old
-            }, redo: {
+                self?.refreshLayerPanel()
+            }, redo: { [weak self] in
                 svgImageSticker.imageOpacity = new
                 sender.value = new
+                self?.refreshLayerPanel()
             }, actionName: "Image Opacity")
             
+            refreshLayerPanel()
         }
     }
     
@@ -468,25 +568,35 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             let newImage = imageSticker.imageView.image
             canvasUndoManager.registerChange(
                 for: imageSticker,
-                undo: {
+                undo: { [weak self] in
                     imageSticker.imageView.tintColor = oldTint
                     imageSticker.imageView.image = oldImage
+                    self?.refreshLayerPanel()
                 },
-                redo: {
+                redo: { [weak self] in
                     imageSticker.imageView.tintColor = .systemRed
                     imageSticker.imageView.image = newImage
+                    self?.refreshLayerPanel()
                 },
                 actionName: "Image Tint"
             )
+            refreshLayerPanel()
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             let oldTint = svgImageSticker.currentTintColor
             svgImageSticker.applyTint(.systemRed)
             canvasUndoManager.registerChange(
                 for: svgImageSticker,
-                undo: { svgImageSticker.applyTint(oldTint) },
-                redo: { svgImageSticker.applyTint(.systemRed) },
+                undo: { [weak self] in
+                    svgImageSticker.applyTint(oldTint)
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgImageSticker.applyTint(.systemRed)
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Image Tint"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -501,25 +611,35 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             let newImage = imageSticker.imageView.image
             canvasUndoManager.registerChange(
                 for: imageSticker,
-                undo: {
+                undo: { [weak self] in
                     imageSticker.imageView.tintColor = oldTint
                     imageSticker.imageView.image = oldImage
+                    self?.refreshLayerPanel()
                 },
-                redo: {
+                redo: { [weak self] in
                     imageSticker.imageView.tintColor = nil
                     imageSticker.imageView.image = newImage
+                    self?.refreshLayerPanel()
                 },
                 actionName: "Image Tint"
             )
+            refreshLayerPanel()
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             let oldTint = svgImageSticker.currentTintColor
             svgImageSticker.applyTint(nil)  // Reset to original
             canvasUndoManager.registerChange(
                 for: svgImageSticker,
-                undo: { svgImageSticker.applyTint(oldTint) },
-                redo: { svgImageSticker.applyTint(nil) },
+                undo: { [weak self] in
+                    svgImageSticker.applyTint(oldTint)
+                    self?.refreshLayerPanel()
+                },
+                redo: { [weak self] in
+                    svgImageSticker.applyTint(nil)
+                    self?.refreshLayerPanel()
+                },
                 actionName: "Image Tint"
             )
+            refreshLayerPanel()
         }
     }
     
@@ -738,6 +858,16 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         self.stickersToolContainer.isHidden = status
         self.imagesToolsContainer.isHidden = status
         self.textToolsContainer.isHidden = status
+    }
+    
+    /// Refresh layer panel to show updated sticker thumbnails
+    /// Uses a small delay to ensure CATextLayer and animations have completed
+    func refreshLayerPanel() {
+        // Delay to allow CATextLayer updates and animations to complete
+        // CATextLayer doesn't immediately clear previous content, causing duplication
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.layerTableView.reloadData()
+        }
     }
 
 

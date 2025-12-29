@@ -55,6 +55,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
         
         coordinator.items.forEach { dropItem in
             if let sourceIndexPath = dropItem.sourceIndexPath {
+                // Capture original indices for undo
+                let fromIndex = sourceIndexPath.row
+                let toIndex = destIndexPath.row
+                
                 tableView.beginUpdates()
                 let removedItem = allStickers.remove(at: sourceIndexPath.row)
                 allStickers.insert(removedItem, at: destIndexPath.row)
@@ -62,6 +66,9 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
                 tableView.endUpdates()
                 
                 self.setupAllStickers()
+                
+                // Register for undo/redo
+                canvasUndoManager.registerLayerReorder(from: fromIndex, to: toIndex)
             }
         }
     }
@@ -76,9 +83,17 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
 
 extension UIView {
     func snapshotImage() -> UIImage {
+        // Guard against zero-sized views
+        guard self.bounds.width > 0 && self.bounds.height > 0 else {
+            return UIImage()
+        }
+        
+        // Force layout to complete before snapshotting
+        self.layoutIfNeeded()
+
         let renderer = UIGraphicsImageRenderer(bounds: self.bounds)
-        return renderer.image { _ in
-            self.drawHierarchy(in: self.bounds, afterScreenUpdates: true)
+        return renderer.image { context in
+            self.drawHierarchy(in: self.bounds, afterScreenUpdates: false)
         }
     }
 }

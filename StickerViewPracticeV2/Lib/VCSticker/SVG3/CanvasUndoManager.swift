@@ -15,6 +15,9 @@ final class CanvasUndoManager {
     /// Callback to update UI button states
     var onUndoRedoStateChanged: (() -> Void)?
     
+    /// Callback to refresh layer panel after changes
+    var onLayersChanged: (() -> Void)?
+    
     /// Reference to the canvas view (for re-adding stickers)
     weak var canvasView: UIView?
     
@@ -26,6 +29,10 @@ final class CanvasUndoManager {
     var wireSticker: ((VCBaseSticker) -> Void)?  // Re-wire callbacks after restore
     var selectSticker: ((VCBaseSticker?) -> Void)?  // Focus sticker after undo/redo
     
+    /// Callbacks for layer reordering
+    var reorderStickers: ((_ fromIndex: Int, _ toIndex: Int) -> Void)?  // Reorder stickers in array
+    var updateStickerZOrder: (() -> Void)?  // Update z-order in canvas view
+    
     // MARK: - Undo/Redo State
     
     var canUndo: Bool { undoManager.canUndo }
@@ -36,11 +43,13 @@ final class CanvasUndoManager {
     func undo() {
         undoManager.undo()
         notifyStateChanged()
+        onLayersChanged?()
     }
     
     func redo() {
         undoManager.redo()
         notifyStateChanged()
+        onLayersChanged?()
     }
     
     func clearAll() {
@@ -315,6 +324,40 @@ final class CanvasUndoManager {
     
     func endGrouping() {
         undoManager.endUndoGrouping()
+        notifyStateChanged()
+    }
+    
+    // MARK: - Register Layer Reorder
+    
+    /// Register undo/redo for layer reordering (drag & drop in layer panel)
+    func registerLayerReorder(from sourceIndex: Int, to destIndex: Int) {
+        undoManager.registerUndo(withTarget: self) { [weak self] manager in
+            guard let self = self else { return }
+            
+            // Undo: move back from destIndex to sourceIndex
+            self.reorderStickers?(destIndex, sourceIndex)
+            self.updateStickerZOrder?()
+            self.onLayersChanged?()
+            
+            // Register redo (move forward again)
+            self.registerLayerReorderRedo(from: sourceIndex, to: destIndex)
+        }
+        undoManager.setActionName("Reorder Layer")
+        notifyStateChanged()
+    }
+    
+    private func registerLayerReorderRedo(from sourceIndex: Int, to destIndex: Int) {
+        undoManager.registerUndo(withTarget: self) { [weak self] manager in
+            guard let self = self else { return }
+            
+            // Redo: move from sourceIndex to destIndex again
+            self.reorderStickers?(sourceIndex, destIndex)
+            self.updateStickerZOrder?()
+            self.onLayersChanged?()
+            
+            // Register undo again
+            self.registerLayerReorder(from: sourceIndex, to: destIndex)
+        }
         notifyStateChanged()
     }
 }
