@@ -272,14 +272,14 @@
                                                             <rect key="frame" x="0.0" y="0.0" width="284" height="75"/>
                                                             <subviews>
                                                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bxX-Bl-TcJ">
-                                                                    <rect key="frame" x="8" y="7.6666666666666643" width="100" height="59.999999999999993"/>
+                                                                    <rect key="frame" x="0.0" y="7.6666666666666643" width="100" height="59.999999999999993"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="100" id="fZL-NL-s2w"/>
                                                                         <constraint firstAttribute="height" constant="60" id="ge0-SG-Mgh"/>
                                                                     </constraints>
                                                                 </imageView>
                                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Av9-cf-y2n">
-                                                                    <rect key="frame" x="140" y="17.666666666666671" width="40" height="40"/>
+                                                                    <rect key="frame" x="146" y="17.666666666666671" width="40" height="40"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="40" id="017-pZ-NEn"/>
                                                                         <constraint firstAttribute="height" constant="40" id="v4X-Vs-UBp"/>
@@ -291,7 +291,7 @@
                                                                     </connections>
                                                                 </button>
                                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YSg-g3-8c1">
-                                                                    <rect key="frame" x="188" y="17.666666666666671" width="40" height="40"/>
+                                                                    <rect key="frame" x="194" y="17.666666666666671" width="40" height="40"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="height" constant="40" id="drk-RT-kR3"/>
                                                                         <constraint firstAttribute="width" constant="40" id="vy3-gl-J14"/>
@@ -303,7 +303,7 @@
                                                                     </connections>
                                                                 </button>
                                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IOn-0H-BPk">
-                                                                    <rect key="frame" x="236" y="17.666666666666671" width="40" height="40"/>
+                                                                    <rect key="frame" x="242" y="17.666666666666671" width="40" height="40"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" constant="40" id="j3s-wE-O47"/>
                                                                         <constraint firstAttribute="height" constant="40" id="lYr-bE-cuB"/>
@@ -314,14 +314,29 @@
                                                                         <action selector="dragBtnAction:" destination="sSn-WJ-eYt" eventType="touchUpInside" id="83M-sE-Fos"/>
                                                                     </connections>
                                                                 </button>
+                                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V86-H3-cov">
+                                                                    <rect key="frame" x="98" y="17.666666666666671" width="40" height="40"/>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="height" constant="40" id="7Xw-YN-jgb"/>
+                                                                        <constraint firstAttribute="width" constant="40" id="cRH-Tb-P6F"/>
+                                                                    </constraints>
+                                                                    <state key="normal" title="Button"/>
+                                                                    <buttonConfiguration key="configuration" style="plain" image="lock.open" catalog="system"/>
+                                                                    <connections>
+                                                                        <action selector="hideBtnAction:" destination="sSn-WJ-eYt" eventType="touchUpInside" id="kQQ-av-OFe"/>
+                                                                        <action selector="unlockBtnAction:" destination="sSn-WJ-eYt" eventType="touchUpInside" id="QbG-Mq-hgP"/>
+                                                                    </connections>
+                                                                </button>
                                                             </subviews>
                                                             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                             <constraints>
                                                                 <constraint firstItem="Av9-cf-y2n" firstAttribute="centerY" secondItem="ah2-Nq-HWX" secondAttribute="centerY" id="0SC-4v-Tae"/>
+                                                                <constraint firstItem="Av9-cf-y2n" firstAttribute="leading" secondItem="V86-H3-cov" secondAttribute="trailing" constant="8" id="0Ta-Ow-3GT"/>
                                                                 <constraint firstItem="IOn-0H-BPk" firstAttribute="leading" secondItem="YSg-g3-8c1" secondAttribute="trailing" constant="8" id="7nc-46-MXW"/>
+                                                                <constraint firstItem="V86-H3-cov" firstAttribute="centerY" secondItem="ah2-Nq-HWX" secondAttribute="centerY" id="DqZ-hy-A2I"/>
                                                                 <constraint firstItem="YSg-g3-8c1" firstAttribute="leading" secondItem="Av9-cf-y2n" secondAttribute="trailing" constant="8" id="LYm-ii-1Gi"/>
-                                                                <constraint firstItem="bxX-Bl-TcJ" firstAttribute="leading" secondItem="ah2-Nq-HWX" secondAttribute="leading" constant="8" id="a6b-3U-65X"/>
-                                                                <constraint firstAttribute="trailing" secondItem="IOn-0H-BPk" secondAttribute="trailing" constant="8" id="i1W-TX-cfa"/>
+                                                                <constraint firstItem="bxX-Bl-TcJ" firstAttribute="leading" secondItem="ah2-Nq-HWX" secondAttribute="leading" id="a6b-3U-65X"/>
+                                                                <constraint firstAttribute="trailing" secondItem="IOn-0H-BPk" secondAttribute="trailing" constant="2" id="i1W-TX-cfa"/>
                                                                 <constraint firstItem="IOn-0H-BPk" firstAttribute="centerY" secondItem="ah2-Nq-HWX" secondAttribute="centerY" id="iGm-h3-w2y"/>
                                                                 <constraint firstItem="YSg-g3-8c1" firstAttribute="centerY" secondItem="ah2-Nq-HWX" secondAttribute="centerY" id="rQC-tS-3nk"/>
                                                                 <constraint firstItem="bxX-Bl-TcJ" firstAttribute="centerY" secondItem="ah2-Nq-HWX" secondAttribute="centerY" id="sgH-zX-Wgl"/>
@@ -340,6 +355,7 @@
                                                     <outlet property="dragBtn" destination="IOn-0H-BPk" id="Ika-Se-aeF"/>
                                                     <outlet property="hideBtn" destination="Av9-cf-y2n" id="RIj-bY-N7L"/>
                                                     <outlet property="previewImageView" destination="bxX-Bl-TcJ" id="8ni-VQ-Xyf"/>
+                                                    <outlet property="unlockBtn" destination="V86-H3-cov" id="bcV-LW-akv"/>
                                                 </connections>
                                             </tableViewCell>
                                         </prototypes>
@@ -476,6 +492,7 @@
         <image name="eye" catalog="system" width="128" height="79"/>
         <image name="italic" catalog="system" width="115" height="128"/>
         <image name="line.horizontal.3" catalog="system" width="128" height="65"/>
+        <image name="lock.open" catalog="system" width="128" height="110"/>
         <image name="square.2.layers.3d.fill" catalog="system" width="128" height="124"/>
         <image name="trash" catalog="system" width="117" height="128"/>
         <image name="xmark" catalog="system" width="128" height="113"/>

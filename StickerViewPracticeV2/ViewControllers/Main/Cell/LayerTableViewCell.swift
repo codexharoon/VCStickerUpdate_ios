@@ -10,6 +10,7 @@ import UIKit
 class LayerTableViewCell: UITableViewCell {
     
     @IBOutlet weak var previewImageView: UIImageView!
+    @IBOutlet weak var unlockBtn: UIButton!
     @IBOutlet weak var hideBtn: UIButton!
     @IBOutlet weak var deleteBtn: UIButton!
     @IBOutlet weak var dragBtn: UIButton!
@@ -33,12 +34,17 @@ class LayerTableViewCell: UITableViewCell {
     }
     
     
+    @IBAction func unlockBtnAction(_ sender: Any) {
+    }
+    
+    
     @IBAction func hideBtnAction(_ sender: Any) {
     }
     
     
     @IBAction func deleteBtnAction(_ sender: Any) {
     }
+    
     
     @IBAction func dragBtnAction(_ sender: Any) {
     }
