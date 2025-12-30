@@ -812,6 +812,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             
             self.activeSticker = nil
             self.handleToolsForActiveSticker()
+            
+            self.layerTableView.reloadData()
         }
         
         // Register transform changes for undo
@@ -870,9 +872,15 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     func refreshLayerPanel() {
         guard isLayerVisible else { return }
         
+        let numOfRows = layerTableView.numberOfRows(inSection: 0)
+        if numOfRows != allStickers.count {
+            layerTableView.reloadData()
+            return
+        }
+        
         if let sticker = activeSticker,
-           let index = allStickers.firstIndex(where: { $0 === sticker }) {
-            // Reload only the changed row
+           let index = allStickers.firstIndex(where: { $0 === sticker }),
+           index < numOfRows {
             layerTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
     }
@@ -896,12 +904,16 @@ extension ViewController {
                         DispatchQueue.main.async {
                             let sticker = self.createImageSticker(image: selectedImage)
                             self.allStickers.append(sticker)
-                            self.stickerView.addSubview(sticker)
+                            self.setupAllStickers()
                             
                             // Register for undo (user-added sticker should be undoable)
                             self.canvasUndoManager.registerAddSticker(sticker)
                             
                             sticker.beginEditing()
+                            
+                            DispatchQueue.main.async {
+                                self.layerTableView.reloadData()
+                            }
                         }
                     }
                 }

@@ -63,9 +63,12 @@ final class CanvasUndoManager {
     
     // MARK: - Register Add Sticker
     
+    /// Register undo/redo for adding a sticker.
+    /// Uses STRONG reference to sticker because after undo removes it,
+    /// we need to keep it alive for redo to re-add it.
     func registerAddSticker(_ sticker: VCBaseSticker) {
-        undoManager.registerUndo(withTarget: self) { [weak self, weak sticker] manager in
-            guard let self = self, let sticker = sticker else { return }
+        undoManager.registerUndo(withTarget: self) { [weak self, sticker] manager in
+            guard let self = self else { return }
             
             // Remove from array and view
             self.removeSticker?(sticker)
@@ -82,8 +85,8 @@ final class CanvasUndoManager {
     }
     
     private func registerAddStickerRedo(_ sticker: VCBaseSticker) {
-        undoManager.registerUndo(withTarget: self) { [weak self, weak sticker] manager in
-            guard let self = self, let sticker = sticker else { return }
+        undoManager.registerUndo(withTarget: self) { [weak self, sticker] manager in
+            guard let self = self else { return }
             
             // Re-add to array and view
             self.addSticker?(sticker)
