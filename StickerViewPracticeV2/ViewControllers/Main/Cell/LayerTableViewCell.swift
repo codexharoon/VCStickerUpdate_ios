@@ -26,6 +26,12 @@ class LayerTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        // Clear preview image to prevent overlapping/blurry artifacts
+        previewImageView.image = nil
+    }
+    
     
     @IBAction func hideBtnAction(_ sender: Any) {
     }

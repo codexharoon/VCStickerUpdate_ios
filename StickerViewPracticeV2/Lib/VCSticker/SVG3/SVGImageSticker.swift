@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 public final class SVGImageSticker: VCBaseSticker {
 
@@ -127,5 +128,42 @@ public final class SVGImageSticker: VCBaseSticker {
     public func resetAppearance() {
         self.imageOpacity = 1.0
         self.shapeTintColor = nil
+    }
+    
+    // MARK: - Preview Snapshot
+    
+    /// Renders SVG content directly for layer preview.
+    /// Renders svgLayer only (excludes border which is on contentView.layer).
+    public override func cleanPreviewSnapshot(size: CGSize = CGSize(width: 80, height: 80)) -> UIImage {
+        // Ensure svgLayer frame matches contentView
+        svgLayer.frame = contentView.bounds
+        svgLayer.sublayers?.first?.frame = svgLayer.bounds
+        
+        let layerBounds = svgLayer.bounds
+        guard layerBounds.width > 0 && layerBounds.height > 0 else {
+            return UIImage()
+        }
+        
+        // Render svgLayer directly (excludes border on contentView.layer)
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = UIScreen.main.scale
+        format.opaque = false
+        
+        let renderer = UIGraphicsImageRenderer(size: layerBounds.size, format: format)
+        let contentImage = renderer.image { context in
+            svgLayer.render(in: context.cgContext)
+        }
+        
+        guard contentImage.size.width > 0 && contentImage.size.height > 0 else {
+            return UIImage()
+        }
+        
+        // Scale to fit within target size
+        let targetRect = AVMakeRect(aspectRatio: contentImage.size, insideRect: CGRect(origin: .zero, size: size))
+        
+        let finalRenderer = UIGraphicsImageRenderer(size: size, format: format)
+        return finalRenderer.image { context in
+            contentImage.draw(in: targetRect)
+        }
     }
 }

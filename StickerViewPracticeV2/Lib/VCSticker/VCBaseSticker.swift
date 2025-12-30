@@ -9,6 +9,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 enum VCBorderStyle {
     case dotted
@@ -242,6 +243,43 @@ open class VCBaseSticker: UIView {
         resizeBtnTopRight.isHidden = true
         border.removeFromSuperlayer()
         onFinishEditing?()
+    }
+    
+    // MARK: - Preview Snapshot
+    
+    /// Renders contentView content for layer preview.
+    /// Excludes controls (siblings) and border (hidden via isHidden).
+    /// Does NOT modify sticker state to avoid visual jitter on canvas.
+    public func cleanPreviewSnapshot(size: CGSize = CGSize(width: 80, height: 80)) -> UIImage {
+        let contentBounds = contentView.bounds
+        guard contentBounds.width > 0 && contentBounds.height > 0 else {
+            return UIImage()
+        }
+        
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = UIScreen.main.scale
+        format.opaque = false
+        
+        // Render contentView.layer directly (excludes sibling controls)
+        let renderer = UIGraphicsImageRenderer(size: contentBounds.size, format: format)
+        let contentImage = renderer.image { context in
+            let borderWasHidden = border.isHidden
+            border.isHidden = true
+            contentView.layer.render(in: context.cgContext)
+            border.isHidden = borderWasHidden
+        }
+        
+        guard contentImage.size.width > 0 && contentImage.size.height > 0 else {
+            return UIImage()
+        }
+        
+        // Scale to fit within target size
+        let targetRect = AVMakeRect(aspectRatio: contentImage.size, insideRect: CGRect(origin: .zero, size: size))
+        
+        let finalRenderer = UIGraphicsImageRenderer(size: size, format: format)
+        return finalRenderer.image { context in
+            contentImage.draw(in: targetRect)
+        }
     }
 }
 

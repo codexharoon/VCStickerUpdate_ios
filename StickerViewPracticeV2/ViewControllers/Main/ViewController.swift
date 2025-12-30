@@ -189,7 +189,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 //        self.present(textViewEditVC, animated: true)
         
         SVGCanvasLoader.load(
-                svgNamed: "3",
+                svgNamed: "4",
                 into: stickerView,
                 stickers: &allStickers
             ){ sticker in
@@ -773,6 +773,10 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             sticker.finishEditing()
             self.stickerView.addSubview(sticker)
         }
+        
+        if let a = self.activeSticker {
+            a.beginEditing()
+        }
     }
     
     // MARK: - Centralized selection handling
@@ -860,13 +864,16 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         self.textToolsContainer.isHidden = status
     }
     
-    /// Refresh layer panel to show updated sticker thumbnails
-    /// Uses a small delay to ensure CATextLayer and animations have completed
+    
+    /// Refresh the layer panel preview for the active sticker only (efficient).
+    /// Reloading a single row is much faster than reloading the entire table.
     func refreshLayerPanel() {
-        // Delay to allow CATextLayer updates and animations to complete
-        // CATextLayer doesn't immediately clear previous content, causing duplication
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.layerTableView.reloadData()
+        guard isLayerVisible else { return }
+        
+        if let sticker = activeSticker,
+           let index = allStickers.firstIndex(where: { $0 === sticker }) {
+            // Reload only the changed row
+            layerTableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .none)
         }
     }
 
