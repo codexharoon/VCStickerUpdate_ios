@@ -189,10 +189,11 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 //        self.present(textViewEditVC, animated: true)
         
         SVGCanvasLoader.load(
-                svgNamed: "4",
+                svgNamed: "3",
                 into: stickerView,
                 stickers: &allStickers
             ){ sticker in
+                sticker.borderStyle = .dotted
                 self.wireStickerCallbacks(sticker)
                 
                 // NOTE: Initial SVG load is NOT registered for undo
@@ -207,7 +208,9 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
                 }
         }
         
-        layerTableView.reloadData()
+        DispatchQueue.main.async {
+            self.layerTableView.reloadData()
+        }
         
     }
     
@@ -682,9 +685,28 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             textViewEditorVC.text = textViewSticker.text
             
             textViewEditorVC.onDoneTap = { text in
+                let old = textViewSticker.text
                 textViewSticker.text = text
+                
+                self.canvasUndoManager.registerChange(
+                    for: textViewSticker,
+                    undo: { [weak self] in
+                        textViewSticker.text = old
+                        self?.refreshLayerPanel()
+                    },
+                    redo: { [weak self] in
+                        textViewSticker.text = text
+                        self?.refreshLayerPanel()
+                    },
+                    actionName: "Text Edit"
+                )
+                
                 self.setupAllStickers()
                 textViewSticker.beginEditing()
+                
+                DispatchQueue.main.async {
+                    self.refreshLayerPanel()
+                }
             }
             
             present(textViewEditorVC, animated: true)
@@ -694,9 +716,32 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             let textViewEditorVC = self.getTextViewEditorVC()
             textViewEditorVC.text = svgTextSticker.text
             
-            textViewEditorVC.onDoneTap = { [weak svgTextSticker] text in
-                svgTextSticker?.text = text
-                svgTextSticker?.beginEditing()
+            textViewEditorVC.onDoneTap = { [weak self, weak svgTextSticker] text in
+                guard let self = self, let svgTextSticker = svgTextSticker else { return }
+                
+                let oldText = svgTextSticker.text
+                svgTextSticker.text = text
+                
+                // Register undo/redo for text change
+                self.canvasUndoManager.registerChange(
+                    for: svgTextSticker,
+                    undo: { [weak self] in
+                        svgTextSticker.text = oldText
+                        self?.refreshLayerPanel()
+                    },
+                    redo: { [weak self] in
+                        svgTextSticker.text = text
+                        self?.refreshLayerPanel()
+                    },
+                    actionName: "Text Edit"
+                )
+                
+                svgTextSticker.beginEditing()
+                
+                // Sync layer panel
+                DispatchQueue.main.async {
+                    self.refreshLayerPanel()
+                }
             }
             
             present(textViewEditorVC, animated: true)
