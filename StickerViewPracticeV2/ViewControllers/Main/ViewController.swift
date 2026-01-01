@@ -62,6 +62,11 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         // Setup undo manager
         setupUndoManager()
         
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
         loadSvg()
     }
     
@@ -265,6 +270,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         activeSticker = nil
         canvasUndoManager.clearAll()
         stickerToolsContainerIsHidden(true)
+
+        loadSvg()
     }
     
     

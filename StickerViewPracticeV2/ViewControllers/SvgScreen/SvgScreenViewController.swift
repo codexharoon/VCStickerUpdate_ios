@@ -25,6 +25,14 @@ class SvgScreenViewController: UIViewController, UICollectionViewDelegate, UICol
         loadData()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        #if targetEnvironment(simulator)
+            self.loadData()
+        #endif
+    }
+    
     
     func getSVGFiles() -> [String] {
         let paths = Bundle.main.paths(forResourcesOfType: "svg", inDirectory: nil)
@@ -48,14 +56,19 @@ class SvgScreenViewController: UIViewController, UICollectionViewDelegate, UICol
         
         if let path = Bundle.main.path(forResource: item, ofType: nil) {
             let svgImage = SVGKImage(contentsOfFile: path)
-            cell.imageView.image = svgImage?.uiImage
+            let data = svgImage?.uiImage.jpegData(compressionQuality: 0.3)
+            if let d = data {
+                let img = UIImage(data: d)
+                cell.imageView.image = img
+            }
         }
         
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: (collectionView.frame.width) / 2 - 10, height: 180)
+        let items: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2
+        return CGSize(width: (collectionView.frame.width) / items - 10, height: 180)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
