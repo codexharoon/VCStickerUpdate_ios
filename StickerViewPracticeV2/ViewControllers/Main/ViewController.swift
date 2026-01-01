@@ -34,21 +34,14 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBOutlet weak var layerTableView: UITableView!
     
     var allStickers: [VCBaseSticker] = []
-    
     var activeSticker: VCBaseSticker?
-    
-    // Undo/Redo Manager (internal so extensions can register layer changes)
     let canvasUndoManager = CanvasUndoManager()
-    
     var isLayerVisible = false
-    
     var svgName: String? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
-//        setupSticker()
         
         stickerViewContainer.layer.borderColor = UIColor.gray.cgColor
         stickerViewContainer.layer.borderWidth = 1.0
@@ -668,36 +661,6 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     }
     
     
-    
-    
-    func setupSticker(){
-        let imageSticker = VCImageSticker(frame: CGRect(x: 20, y: 40, width: 200, height: 200))
-        imageSticker.borderStyle = .dotted
-        imageSticker.borderColor = .systemTeal
-        imageSticker.imageView.image = UIImage(named: "ImageScannerIcon")
-        wireStickerCallbacks(imageSticker)
-        stickerView.addSubview(imageSticker)
-        
-        let textSticker = VCTextViewSticker(center: self.view.center)
-        textSticker.borderStyle = .dotted
-        textSticker.borderColor = .systemTeal
-        textSticker.text = "Haroon. this is large text \n testing is the process \n testing is testing Haroon. this is large text \n testing is the process \n testing is testing"
-        textSticker.stickerTextColor = .label
-        textSticker.stickerAlignment = .left
-        textSticker.stickerFontName = "SF Mono"
-        textSticker.stickerIsBold = true
-        textSticker.stickerIsItalic = true
-        wireStickerCallbacks(textSticker)
-        stickerView.addSubview(textSticker)
-        
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapGesture))
-        gesture.numberOfTapsRequired = 2
-        
-        textSticker.isUserInteractionEnabled = true
-        textSticker.addGestureRecognizer(gesture)
-    }
-    
-    
     @objc
     func handleDoubleTapGesture(_ gesture: UITapGestureRecognizer){
         // Handle VCTextViewSticker
@@ -961,7 +924,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
 
 }
 
-
+// MARK: - image picker
 
 extension ViewController {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
