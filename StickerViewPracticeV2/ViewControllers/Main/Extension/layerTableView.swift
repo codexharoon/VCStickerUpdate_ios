@@ -33,6 +33,29 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
         cell.previewImageView.contentMode = .scaleAspectFit
         cell.previewImageView.clipsToBounds = true
         
+        if sticker.isHidden {
+            cell.hideBtn.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+        } else {
+            cell.hideBtn.setImage(UIImage(systemName: "eye"), for: .normal)
+        }
+        
+        cell.onHideTap = {
+            sticker.isHidden = !sticker.isHidden
+            
+            if sticker.isHidden {
+                cell.hideBtn.setImage(UIImage(systemName: "eye.slash"), for: .normal)
+                sticker.finishEditing()
+            } else {
+                cell.hideBtn.setImage(UIImage(systemName: "eye"), for: .normal)
+                sticker.beginEditing()
+            }
+        }
+        
+        cell.onDeleteTap = { [weak self] in
+            guard let self = self else {return}
+            self.handleRemoveSticker(sticker: sticker)
+        }
+        
         return cell
     }
     

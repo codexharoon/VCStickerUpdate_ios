@@ -15,6 +15,10 @@ class LayerTableViewCell: UITableViewCell {
     @IBOutlet weak var deleteBtn: UIButton!
     @IBOutlet weak var dragBtn: UIButton!
     
+    var onUnlockTap: (() -> Void)?
+    var onHideTap: (() -> Void)?
+    var onDeleteTap: (() -> Void)?
+    var onDragTap: (() -> Void)?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -35,18 +39,22 @@ class LayerTableViewCell: UITableViewCell {
     
     
     @IBAction func unlockBtnAction(_ sender: Any) {
+        onUnlockTap?()
     }
     
     
     @IBAction func hideBtnAction(_ sender: Any) {
+        onHideTap?()
     }
     
     
     @IBAction func deleteBtnAction(_ sender: Any) {
+        onDeleteTap?()
     }
     
     
     @IBAction func dragBtnAction(_ sender: Any) {
+        onDragTap?()
     }
     
 }

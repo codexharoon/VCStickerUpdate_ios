@@ -159,7 +159,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         isLayerVisible.toggle()
         layerTableView.reloadData()
         
-        let width: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 300 : 150
+        let width: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 300 : 250
 
         layerContainerWidth.constant = isLayerVisible ? width : 0
 
@@ -844,21 +844,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         sticker.onClose = { [weak self, weak sticker] in
             guard let self = self, let s = sticker else { return }
             
-            // Register undo for delete BEFORE removing
-            self.canvasUndoManager.registerRemoveSticker(s)
-            
-            // Remove from our tracking array when closed
-            if let idx = self.allStickers.firstIndex(where: { $0 === s }) {
-                self.allStickers.remove(at: idx)
-            }
-            
-            // Remove from view (VCBaseSticker no longer auto-removes when onClose is set)
-            s.removeFromSuperview()
-            
-            self.activeSticker = nil
-            self.handleToolsForActiveSticker()
-            
-            self.layerTableView.reloadData()
+            self.handleRemoveSticker(sticker: s)
         }
         
         // Register transform changes for undo
@@ -866,6 +852,27 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             guard let self = self, let s = sticker else { return }
             self.canvasUndoManager.registerTransformChange(for: s, from: oldTransform, oldCenter: oldCenter)
         }
+    }
+    
+    
+    func handleRemoveSticker(sticker: VCBaseSticker?){
+        guard let s = sticker else { return }
+        
+        // Register undo for delete BEFORE removing
+        self.canvasUndoManager.registerRemoveSticker(s)
+        
+        // Remove from our tracking array when closed
+        if let idx = self.allStickers.firstIndex(where: { $0 === s }) {
+            self.allStickers.remove(at: idx)
+        }
+        
+        // Remove from view (VCBaseSticker no longer auto-removes when onClose is set)
+        s.removeFromSuperview()
+        
+        self.activeSticker = nil
+        self.handleToolsForActiveSticker()
+        
+        self.layerTableView.reloadData()
     }
     
     
