@@ -42,6 +42,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     var isLayerVisible = false
     
+    var svgName: String? = nil
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -66,6 +68,41 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         // Setup undo manager
         setupUndoManager()
+        
+        loadSvg()
+    }
+    
+    
+    func loadSvg(){
+        guard let name = self.svgName else { return }
+        SVGCanvasLoader.load(
+                svgNamed: name,
+                into: stickerView,
+                stickers: &allStickers
+            ){ sticker in
+                sticker.borderStyle = .dotted
+                self.wireStickerCallbacks(sticker)
+                
+                // NOTE: Initial SVG load is NOT registered for undo
+                // Undo/redo only applies to user changes (move, edit, delete, add new)
+                
+                // Add double-tap gesture for text editing on SVG text stickers
+                if sticker is SVGTextSticker {
+                    let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTapGesture))
+                    gesture.numberOfTapsRequired = 2
+                    sticker.isUserInteractionEnabled = true
+                    sticker.addGestureRecognizer(gesture)
+                }
+        }
+        
+        DispatchQueue.main.async {
+            self.layerTableView.reloadData()
+        }
+    }
+    
+    
+    @IBAction func backBtnAction(_ sender: Any) {
+        self.dismiss(animated: true)
     }
     
     
@@ -175,42 +212,26 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     @IBAction func addTextStickerAction(_ sender: Any) {
-//        let textViewEditVC = self.getTextViewEditorVC()
-//        
-//        textViewEditVC.onDoneTap = { [weak self] text in
-//            guard let self = self else { return }
-//            
-//            let textSticker = self.createSvgTextSticker(text: text)
-//            self.allStickers.append(textSticker)
-//            self.setupAllStickers()
-//            textSticker.beginEditing()
-//        }
-//        
-//        self.present(textViewEditVC, animated: true)
+        let textViewEditVC = self.getTextViewEditorVC()
         
-        SVGCanvasLoader.load(
-                svgNamed: "3",
-                into: stickerView,
-                stickers: &allStickers
-            ){ sticker in
-                sticker.borderStyle = .dotted
-                self.wireStickerCallbacks(sticker)
-                
-                // NOTE: Initial SVG load is NOT registered for undo
-                // Undo/redo only applies to user changes (move, edit, delete, add new)
-                
-                // Add double-tap gesture for text editing on SVG text stickers
-                if sticker is SVGTextSticker {
-                    let gesture = UITapGestureRecognizer(target: self, action: #selector(self.handleDoubleTapGesture))
-                    gesture.numberOfTapsRequired = 2
-                    sticker.isUserInteractionEnabled = true
-                    sticker.addGestureRecognizer(gesture)
-                }
+        textViewEditVC.onDoneTap = { [weak self] text in
+            guard let self = self else { return }
+            
+            let textSticker = self.createSvgTextSticker(text: text)
+            self.allStickers.append(textSticker)
+            self.setupAllStickers()
+            
+            // Register for undo (user-added sticker should be undoable)
+            self.canvasUndoManager.registerAddSticker(textSticker)
+            
+            textSticker.beginEditing()
+            
+            DispatchQueue.main.async {
+                self.layerTableView.reloadData()
+            }
         }
         
-        DispatchQueue.main.async {
-            self.layerTableView.reloadData()
-        }
+        self.present(textViewEditVC, animated: true)
         
     }
     
