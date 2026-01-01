@@ -29,9 +29,33 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
         let cell = tableView.dequeueReusableCell(withIdentifier: "LayerTableViewCell", for: indexPath) as! LayerTableViewCell
         let sticker = allStickers[indexPath.row]
         
+        // preview image
+        
         cell.previewImageView.image = sticker.cleanPreviewSnapshot(size: CGSize(width: 80, height: 80))
         cell.previewImageView.contentMode = .scaleAspectFit
         cell.previewImageView.clipsToBounds = true
+        
+        // lock
+        
+        if sticker.isLocked {
+            cell.unlockBtn.setImage(UIImage(systemName: "lock.fill"), for: .normal)
+        } else {
+            cell.unlockBtn.setImage(UIImage(systemName: "lock.open"), for: .normal)
+        }
+        
+        cell.onUnlockTap = {
+            sticker.isLocked = !sticker.isLocked
+            
+            if sticker.isLocked {
+                cell.unlockBtn.setImage(UIImage(systemName: "lock.fill"), for: .normal)
+                sticker.finishEditing()
+            } else {
+                cell.unlockBtn.setImage(UIImage(systemName: "lock.open"), for: .normal)
+                sticker.beginEditing()
+            }
+        }
+        
+        // hide
         
         if sticker.isHidden {
             cell.hideBtn.setImage(UIImage(systemName: "eye.slash"), for: .normal)
@@ -50,6 +74,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource, UITableVie
                 sticker.beginEditing()
             }
         }
+        
+        // delete
         
         cell.onDeleteTap = { [weak self] in
             guard let self = self else {return}

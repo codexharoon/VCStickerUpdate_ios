@@ -57,6 +57,7 @@ open class VCBaseSticker: UIView {
     
     public var initState = -1
     public var isEditing: Bool = false
+    public var isLocked: Bool = false
     
     /// 记录缩放/旋转的开始时的状态
     private var lastAngle: CGFloat!
@@ -288,6 +289,9 @@ extension VCBaseSticker {
     
     /// 拖动手势
     @objc func handlePanGesture(gesture: UIPanGestureRecognizer) {
+        // Prevent manipulation when locked
+        if isLocked { return }
+        
         if !isEditing {
             beginEditing()
         }
@@ -335,6 +339,9 @@ extension VCBaseSticker {
     
     /// 旋转控制（底部右侧按钮）
     @objc func handleRotate(gesture: UIPanGestureRecognizer) {
+        // Prevent manipulation when locked
+        if isLocked { return }
+        
         // 以当前父页面为计算参考
         let location = gesture.location(in: self.superview)
         let center = self.center
@@ -366,6 +373,9 @@ extension VCBaseSticker {
     
     /// 缩放控制（右上角按钮）- 保留原方法名以兼容子类覆盖
     @objc func handleResize(gesture: UIPanGestureRecognizer) {
+        // Prevent manipulation when locked
+        if isLocked { return }
+        
         // 以当前父页面为计算参考
         let location = gesture.location(in: self.superview)
         let center = self.center

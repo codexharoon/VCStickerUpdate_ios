@@ -343,7 +343,6 @@
                                                                     <state key="normal" title="Button"/>
                                                                     <buttonConfiguration key="configuration" style="plain" image="lock.open" catalog="system"/>
                                                                     <connections>
-                                                                        <action selector="hideBtnAction:" destination="sSn-WJ-eYt" eventType="touchUpInside" id="kQQ-av-OFe"/>
                                                                         <action selector="unlockBtnAction:" destination="sSn-WJ-eYt" eventType="touchUpInside" id="QbG-Mq-hgP"/>
                                                                     </connections>
                                                                 </button>
