@@ -39,6 +39,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     var isLayerVisible = false
     var svgName: String? = nil
     
+    var isSvgLoaded: Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -67,7 +69,10 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        loadSvg()
+        if !isSvgLoaded {
+            loadSvg()
+            isSvgLoaded = true
+        }
     }
     
     
@@ -235,15 +240,44 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     @IBAction func saveSvgAction(_ sender: Any) {
-        if let exportedImage = SVGCanvasExporter.exportCanvasAsPNG(
-            stickerView,
-            stickers: allStickers
-        ){
-            activeSticker = nil
-            
-            presentExportShareSheet(for: exportedImage, fileName: "Design_ \(Date().timeIntervalSince1970)", sourceView: self.view)
+        // Present export options first
+        let exportOptionsVC = ExportOptionsViewController()
+        exportOptionsVC.modalPresentationStyle = .overCurrentContext
+        exportOptionsVC.modalTransitionStyle = .crossDissolve
+        
+        exportOptionsVC.onExportSelected = { [weak self] configuration in
+            self?.performExport(with: configuration)
         }
         
+        present(exportOptionsVC, animated: true)
+    }
+    
+    private func performExport(with configuration: ExportConfiguration) {
+        guard let result = SVGCanvasExporter.exportCanvas(
+            stickerView,
+            stickers: allStickers,
+            configuration: configuration
+        ) else {
+            showExportAlert(title: "Export Failed", message: "No stickers to export")
+            return
+        }
+        
+        activeSticker = nil
+        
+        // Save to temp file and present share sheet
+        let fileName = "Design_\(Int(Date().timeIntervalSince1970))"
+        guard let fileURL = SVGCanvasExporter.saveTempFile(result, fileName: fileName, configuration: configuration) else {
+            showExportAlert(title: "Export Failed", message: "Failed to create \(configuration.format.displayName) file")
+            return
+        }
+        
+        presentExportShareSheet(for: fileURL, configuration: configuration, sourceView: self.view)
+    }
+    
+    private func showExportAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
     
     
