@@ -240,18 +240,13 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     @IBAction func saveSvgAction(_ sender: Any) {
-        // Present export options first
-//        let exportOptionsVC = ExportOptionsViewController()
-//        exportOptionsVC.modalPresentationStyle = .overCurrentContext
-//        exportOptionsVC.modalTransitionStyle = .crossDissolve
-//        
-//        exportOptionsVC.onExportSelected = { [weak self] configuration in
-//            self?.performExport(with: configuration)
-//        }
-//        
-//        present(exportOptionsVC, animated: true)
-        
         let exportCanvasVC = self.storyboard?.instantiateViewController(withIdentifier: "ExportCanvasViewController") as! ExportCanvasViewController
+        
+        exportCanvasVC.onExportTap = {[weak self] configuration in
+            guard let self else {return}
+            self.performExport(with: configuration)
+        }
+        
         exportCanvasVC.modalPresentationStyle = .overCurrentContext
         exportCanvasVC.modalTransitionStyle = .crossDissolve
         
