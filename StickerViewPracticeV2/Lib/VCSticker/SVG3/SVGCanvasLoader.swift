@@ -23,8 +23,17 @@ final class SVGCanvasLoader {
 
         var newStickers: [VCBaseSticker] = []
 
+        var imageNodeIndex = 0
+        
         for node in nodes {
             let sticker = SVGStickerFactory.makeSticker(from: node)
+            
+            // Track original node index for SVGImageSticker
+            if let imageSticker = sticker as? SVGImageSticker {
+                imageSticker.originalNodeIndex = imageNodeIndex
+                imageNodeIndex += 1
+            }
+            
             newStickers.append(sticker)
         }
         
@@ -56,7 +65,7 @@ final class SVGCanvasLoader {
         let targetY = (canvas.bounds.height - scaledHeight) / 2.0
         
         // 4. Apply Scaling and Positioning
-        for sticker in newStickers {
+        for (_, sticker) in newStickers.enumerated() {
             
             // Calculate new center position
             let oldCenter = sticker.center
@@ -72,6 +81,9 @@ final class SVGCanvasLoader {
             wire(sticker)
             stickers.append(sticker)
             canvas.addSubview(sticker)
+            
+            // Staggered Entrance Animation
+//            sticker.performEntranceAnimation(delay: Double(index) * 0.05)
         }
     }
 }

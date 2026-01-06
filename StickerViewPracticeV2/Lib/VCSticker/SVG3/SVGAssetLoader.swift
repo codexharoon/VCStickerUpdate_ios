@@ -34,4 +34,21 @@ final class SVGAssetLoader {
 
         return svgImage
     }
+    
+    /// Load SVG from a file path (for draft restoration)
+    static func loadSVG(fromPath path: String) -> SVGKImage? {
+        let url = URL(fileURLWithPath: path)
+        
+        guard FileManager.default.fileExists(atPath: path) else {
+            print("❌ SVG file not found at path:", path)
+            return nil
+        }
+        
+        guard let svgImage = SVGKImage(contentsOf: url) else {
+            print("❌ Failed to load SVG from path:", path)
+            return nil
+        }
+        
+        return svgImage
+    }
 }

@@ -22,7 +22,33 @@ class SvgScreenViewController: UIViewController, UICollectionViewDelegate, UICol
         svgCollectionView.delegate = self
         svgCollectionView.dataSource = self
         
+        setupDraftsButton()
         loadData()
+    }
+    
+    // MARK: - Drafts Button
+    
+    private func setupDraftsButton() {
+        let draftsButton = UIButton(type: .system)
+        draftsButton.translatesAutoresizingMaskIntoConstraints = false
+        draftsButton.setTitle("Drafts", for: .normal)
+        draftsButton.setImage(UIImage(systemName: "doc.text"), for: .normal)
+        draftsButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        draftsButton.tintColor = .systemBlue
+        draftsButton.addTarget(self, action: #selector(openDrafts), for: .touchUpInside)
+        
+        view.addSubview(draftsButton)
+        
+        NSLayoutConstraint.activate([
+            draftsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            draftsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+        ])
+    }
+    
+    @objc private func openDrafts() {
+        let draftsVC = DraftsViewController()
+        draftsVC.modalPresentationStyle = .fullScreen
+        present(draftsVC, animated: true)
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -39,6 +39,10 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     var isLayerVisible = false
     var svgName: String? = nil
     
+    // Draft support
+    var draftId: UUID? = nil
+    var draftToLoad: DraftModel? = nil
+    
     var isSvgLoaded: Bool = false
     
     override func viewDidLoad() {
@@ -70,7 +74,12 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         super.viewDidAppear(animated)
         
         if !isSvgLoaded {
-            loadSvg()
+            // Check if we're restoring from a draft
+            if draftToLoad != nil {
+                restoreDraft()
+            } else {
+                loadSvg()
+            }
             isSvgLoaded = true
         }
     }
@@ -105,7 +114,126 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     
     
     @IBAction func backBtnAction(_ sender: Any) {
-        self.dismiss(animated: true)
+        showSaveAlert()
+    }
+    
+    // MARK: - Draft Save/Restore
+    
+    private func showSaveAlert() {
+        // If no stickers, just dismiss
+        if allStickers.isEmpty {
+            self.dismiss(animated: true)
+            return
+        }
+        
+        let alert = UIAlertController(
+            title: "Save Draft?",
+            message: "Save your work to continue later",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "Save", style: .default) { _ in
+            self.saveDraftAndDismiss()
+        })
+        
+        alert.addAction(UIAlertAction(title: "Discard", style: .destructive) { _ in
+            self.dismiss(animated: true)
+        })
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        
+        present(alert, animated: true)
+    }
+    
+    private func saveDraftAndDismiss() {
+        guard let name = svgName else {
+            dismiss(animated: true)
+            return
+        }
+        
+        // Deselect all stickers for clean snapshot
+        for sticker in allStickers {
+            sticker.finishEditing()
+        }
+        activeSticker = nil
+        
+        // Capture canvas thumbnail
+        let thumbnail = captureCanvasSnapshot()
+        
+        // Save draft
+        _ = DraftManager.shared.saveDraft(
+            svgName: name,
+            stickers: allStickers,
+            thumbnail: thumbnail,
+            canvas: stickerView,
+            existingDraftId: draftId
+        )
+        
+        dismiss(animated: true)
+    }
+    
+    private func captureCanvasSnapshot() -> UIImage {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = UIScreen.main.scale
+        format.opaque = false
+        
+        let renderer = UIGraphicsImageRenderer(size: stickerView.bounds.size, format: format)
+        return renderer.image { context in
+            stickerView.layer.render(in: context.cgContext)
+        }
+    }
+    
+    /// Load stickers from a draft (called before viewDidAppear)
+    func loadFromDraft(_ draft: DraftModel) {
+        self.draftToLoad = draft
+        self.draftId = draft.id
+        self.svgName = draft.svgName
+    }
+    
+    private func restoreDraft() {
+        guard let draft = draftToLoad else { return }
+        
+        // Restore stickers with their original types and properties
+        // Run heavy SVG parsing on background thread
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            
+            let nodes = DraftManager.shared.loadNodes(for: draft)
+            
+            DispatchQueue.main.async {
+                let restoredStickers = DraftManager.shared.restoreStickers(
+                    from: draft,
+                    into: self.stickerView,
+                    nodes: nodes
+                ) { [weak self] sticker in
+                    self?.wireStickerCallbacks(sticker)
+                    
+                    // Add double-tap for text stickers
+                    if sticker is SVGTextSticker || sticker is VCTextViewSticker {
+                        let gesture = UITapGestureRecognizer(target: self, action: #selector(self?.handleDoubleTapGesture))
+                        gesture.numberOfTapsRequired = 2
+                        sticker.isUserInteractionEnabled = true
+                        sticker.addGestureRecognizer(gesture)
+                    }
+                }
+                
+                self.allStickers = restoredStickers
+                
+                // Select the last sticker
+                if let lastSticker = self.allStickers.last {
+                    // Deselect others first
+                    self.allStickers.forEach { $0.finishEditing() }
+                    
+                    // Select last
+                    lastSticker.beginEditing()
+                    self.activeSticker = lastSticker
+                }
+                
+                self.layerTableView.reloadData()
+            }
+        }
+        
+        draftToLoad = nil
     }
     
     

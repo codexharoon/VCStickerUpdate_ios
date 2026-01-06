@@ -282,6 +282,28 @@ open class VCBaseSticker: UIView {
             contentImage.draw(in: targetRect)
         }
     }
+    // MARK: - Animations
+    
+    public func performEntranceAnimation(delay: TimeInterval) {
+        let finalTransform = self.transform
+        
+        // Initial state: small and transparent
+        self.transform = finalTransform.scaledBy(x: 0.01, y: 0.01)
+        self.alpha = 0
+        
+        UIView.animate(
+            withDuration: 0.6,
+            delay: delay,
+            usingSpringWithDamping: 0.7,
+            initialSpringVelocity: 0.5,
+            options: [.curveEaseOut, .allowUserInteraction],
+            animations: {
+                self.transform = finalTransform
+                self.alpha = 1
+            },
+            completion: nil
+        )
+    }
 }
 
 // 手势动作

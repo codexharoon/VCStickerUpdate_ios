@@ -13,6 +13,9 @@ public final class SVGImageSticker: VCBaseSticker {
     // Root container for SVG layers
     public let svgLayer = CALayer()
     
+    // Track original node index from SVG file (independent of layer order)
+    public var originalNodeIndex: Int = 0
+    
     // MARK: - Appearance Properties
     
     /// Opacity of the image (0.0 - 1.0)
