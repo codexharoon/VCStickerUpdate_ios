@@ -25,6 +25,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBOutlet weak var labelColorBtn: UIButton!
     @IBOutlet weak var shadowSwitch: UISwitch!
     
+    @IBOutlet weak var resetBtn: UIButton!
     @IBOutlet weak var undoBtn: UIButton!
     @IBOutlet weak var redoBtn: UIButton!
     
@@ -315,10 +316,13 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     private func updateUndoRedoButtons() {
         undoBtn.isEnabled = canvasUndoManager.canUndo
         redoBtn.isEnabled = canvasUndoManager.canRedo
+        let resetBtnIsEnabled: Bool = canvasUndoManager.canUndo || canvasUndoManager.canRedo
+        resetBtn.isEnabled = resetBtnIsEnabled
         
         // Visual feedback for disabled state
         undoBtn.alpha = canvasUndoManager.canUndo ? 1.0 : 0.5
         redoBtn.alpha = canvasUndoManager.canRedo ? 1.0 : 0.5
+        resetBtn.alpha = resetBtnIsEnabled ? 1.0 : 0.5
     }
     
     
@@ -434,7 +438,16 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         canvasUndoManager.clearAll()
         stickerToolsContainerIsHidden(true)
 
-        loadSvg()
+        // Check if we're working from a draft
+        if let existingDraftId = draftId,
+           let draft = DraftManager.shared.loadDraft(id: existingDraftId) {
+            // Reset to draft state (not original SVG)
+            draftToLoad = draft
+            restoreDraft()
+        } else {
+            // Reset to original SVG
+            loadSvg()
+        }
     }
     
     

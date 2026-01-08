@@ -610,6 +610,7 @@
                         <outlet property="layerTableView" destination="wnx-Jt-8SC" id="TL4-4N-ZPO"/>
                         <outlet property="redColorBtn" destination="B3L-ip-1L7" id="dud-xx-I9E"/>
                         <outlet property="redoBtn" destination="wJN-8g-Y51" id="sfb-Zz-jUl"/>
+                        <outlet property="resetBtn" destination="gTW-Mr-Okj" id="FNo-qp-1NS"/>
                         <outlet property="shadowSwitch" destination="KXY-iV-LyG" id="Rrh-RO-Uli"/>
                         <outlet property="stickerView" destination="XCm-Nw-kYj" id="DYy-YN-Lrx"/>
                         <outlet property="stickerViewContainer" destination="4J1-2P-ceN" id="eVK-gs-c3U"/>
