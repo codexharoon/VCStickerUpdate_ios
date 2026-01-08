@@ -14,6 +14,9 @@ class DraftScreenCollectionViewCell: UICollectionViewCell {
     
     var onLongPress: (() -> Void)?
     
+    /// Unique ID for current async load - changes every time cell is configured
+    var loadId: UUID?
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -35,6 +38,7 @@ class DraftScreenCollectionViewCell: UICollectionViewCell {
         
         self.imageView.image = nil
         self.onLongPress = nil
+        self.loadId = nil  // Invalidate any pending async loads
     }
     
     

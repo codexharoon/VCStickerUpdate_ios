@@ -19,6 +19,10 @@ class DraftScreenViewController: UIViewController, UICollectionViewDelegate, UIC
         
         draftCollectionView.delegate = self
         draftCollectionView.dataSource = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
         loadDrafts()
     }
@@ -67,7 +71,11 @@ class DraftScreenViewController: UIViewController, UICollectionViewDelegate, UIC
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DraftScreenCollectionViewCell", for: indexPath) as! DraftScreenCollectionViewCell
         
         let draft = self.drafts[indexPath.item]
+        let draftId = draft.id
         
+        // Generate unique load ID - this changes EVERY time cell is configured
+        let thisLoadId = UUID()
+        cell.loadId = thisLoadId
         cell.imageView.image = UIImage(systemName: "doc.fill")
         
         // Long press to delete
@@ -76,14 +84,13 @@ class DraftScreenViewController: UIViewController, UICollectionViewDelegate, UIC
         }
         
         // Load thumbnail asynchronously
-        let draftId = draft.id
         DispatchQueue.global(qos: .userInitiated).async {
             let thumbnail = DraftManager.shared.getThumbnail(forDraftId: draftId)
             
-            DispatchQueue.main.async {
-                // Verify cell is still displaying the same draft (reuse safety)
-                guard let currentIndexPath = collectionView.indexPath(for: cell),
-                      currentIndexPath == indexPath else { return }
+            DispatchQueue.main.async { [weak cell] in
+                // Verify this is still the SAME load (not a stale one from before reload)
+                guard let cell = cell,
+                      cell.loadId == thisLoadId else { return }
                 
                 cell.imageView.image = thumbnail
             }

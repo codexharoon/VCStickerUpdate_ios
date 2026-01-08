@@ -12,7 +12,7 @@ final class DraftManager {
     static let shared = DraftManager()
     
     private let fileManager = FileManager.default
-    private let thumbnailCache = NSCache<NSString, UIImage>()
+//    private let thumbnailCache = NSCache<NSString, UIImage>()
     
     private var draftsDirectory: URL {
         let documentsPath = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -153,12 +153,12 @@ final class DraftManager {
     
     /// Loads thumbnail for a draft (with caching)
     func getThumbnail(forDraftId id: UUID) -> UIImage? {
-        let cacheKey = id.uuidString as NSString
+//        let cacheKey = id.uuidString as NSString
         
         // Check cache first
-        if let cached = thumbnailCache.object(forKey: cacheKey) {
-            return cached
-        }
+//        if let cached = thumbnailCache.object(forKey: cacheKey) {
+//            return cached
+//        }
         
         let draftFolder = draftsDirectory.appendingPathComponent(id.uuidString, isDirectory: true)
         let thumbnailURL = draftFolder.appendingPathComponent("thumbnail.png")
@@ -167,7 +167,7 @@ final class DraftManager {
               let image = UIImage(data: data) else { return nil }
         
         // Cache for next time
-        thumbnailCache.setObject(image, forKey: cacheKey)
+//        thumbnailCache.setObject(image, forKey: cacheKey)
         return image
     }
     
