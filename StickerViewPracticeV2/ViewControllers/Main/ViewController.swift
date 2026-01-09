@@ -742,7 +742,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         let opacity = sender.value  // 0.0 to 1.0
         
         if let imageSticker = self.activeSticker as? VCImageSticker {
-            imageSticker.imageView.alpha = CGFloat(opacity)
+            imageSticker.imageView.layer.opacity = opacity
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             svgImageSticker.imageOpacity = opacity
         }
@@ -754,7 +754,10 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     @IBAction func opacitySliderTouchDown(_ sender: UISlider) {
         isSlidingOpacity = true
         
-        if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+        if let vcImageSticker = self.activeSticker as? VCImageSticker {
+            opacityStartValue = vcImageSticker.imageView.layer.opacity
+        }
+        else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             opacityStartValue = svgImageSticker.imageOpacity
         }
         else{
@@ -773,7 +776,20 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         guard finalValue != startValue else {return}
         
-        if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+        if let vcImageSticker = self.activeSticker as? VCImageSticker {
+            canvasUndoManager.registerChange(
+                for: vcImageSticker,
+                undo: { [weak self] in
+                    vcImageSticker.imageView.layer.opacity = startValue
+                    sender.value = startValue
+                    self?.refreshLayerPanel()
+            }, redo: { [weak self] in
+                vcImageSticker.imageView.layer.opacity = finalValue
+                sender.value = finalValue
+                self?.refreshLayerPanel()
+            }, actionName: "Image Opacity")
+        }
+        else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
             canvasUndoManager.registerChange(
                 for: svgImageSticker,
                 undo: { [weak self] in
@@ -1079,8 +1095,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
             stickersToolContainer.isHidden = false
             imagesToolsContainer.isHidden = false
             textToolsContainer.isHidden = true
-            // Sync slider with current opacity
-            imgOpacitySlider.value = Float(imageSticker.imageView.alpha)
+            // Sync slider with current opacity (standardized)
+            imgOpacitySlider.value = imageSticker.imageView.layer.opacity
         }
         else if let _ = self.activeSticker as? VCTextViewSticker {
             stickersToolContainer.isHidden = false
@@ -1172,3 +1188,4 @@ extension ViewController {
         }
     }
 }
+
