@@ -40,6 +40,9 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     var isLayerVisible = false
     var svgName: String? = nil
     
+    var opacityStartValue: Float = 0
+    var isSlidingOpacity = false
+
     // Draft support
     var draftId: UUID? = nil
     var draftToLoad: DraftModel? = nil
@@ -61,7 +64,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         stickerToolsContainerIsHidden(true)
         
-        imgOpacitySlider.isContinuous = false
+//        imgOpacitySlider.isContinuous = false
         
         layerContainerWidth.constant = 0
         setupLayerTableView()
@@ -463,7 +466,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         self.present(picker, animated: true)
     }
     
-    // text tools
+    // MARK: - text tools
     
     @IBAction func boldAction(_ sender: Any) {
         if let sticker = self.activeSticker as? VCTextViewSticker {
@@ -732,30 +735,58 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
     }
     
     
-    // images tools
+    // MARK: - images tools
     
+    // value chnaged
     @IBAction func imgOpacitySliderAction(_ sender: UISlider) {
         let opacity = sender.value  // 0.0 to 1.0
+        
         if let imageSticker = self.activeSticker as? VCImageSticker {
             imageSticker.imageView.alpha = CGFloat(opacity)
-            refreshLayerPanel()
         } else if let svgImageSticker = self.activeSticker as? SVGImageSticker {
-            let old = svgImageSticker.imageOpacity
             svgImageSticker.imageOpacity = opacity
-            let new = svgImageSticker.imageOpacity
-            
-            canvasUndoManager.registerChange(undo: { [weak self] in
-                svgImageSticker.imageOpacity = old
-                sender.value = old
+        }
+        
+        refreshLayerPanel()
+    }
+    
+    // touch down
+    @IBAction func opacitySliderTouchDown(_ sender: UISlider) {
+        isSlidingOpacity = true
+        
+        if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            opacityStartValue = svgImageSticker.imageOpacity
+        }
+        else{
+            opacityStartValue = sender.value
+        }
+    }
+    
+    // touchup inside + touchup outside
+    @IBAction func opacitySliderTouchEnded(_ sender: UISlider) {
+        guard isSlidingOpacity else {return}
+        
+        isSlidingOpacity = false
+        
+        let finalValue = sender.value
+        let startValue = self.opacityStartValue
+        
+        guard finalValue != startValue else {return}
+        
+        if let svgImageSticker = self.activeSticker as? SVGImageSticker {
+            canvasUndoManager.registerChange(
+                for: svgImageSticker,
+                undo: { [weak self] in
+                svgImageSticker.imageOpacity = startValue
+                sender.value = startValue
                 self?.refreshLayerPanel()
             }, redo: { [weak self] in
-                svgImageSticker.imageOpacity = new
-                sender.value = new
+                svgImageSticker.imageOpacity = finalValue
+                sender.value = finalValue
                 self?.refreshLayerPanel()
             }, actionName: "Image Opacity")
-            
-            refreshLayerPanel()
         }
+        
     }
     
     
