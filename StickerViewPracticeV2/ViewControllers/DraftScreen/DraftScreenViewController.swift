@@ -101,7 +101,8 @@ class DraftScreenViewController: UIViewController, UICollectionViewDelegate, UIC
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let items: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 4 : 2
-        return CGSize(width: (collectionView.frame.width) / items - 10, height: 180)
+        let width = (collectionView.frame.width - 10) / items
+        return CGSize(width: width, height: width * 1.3)
     }
     
     

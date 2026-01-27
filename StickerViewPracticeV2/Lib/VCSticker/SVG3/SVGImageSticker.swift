@@ -45,13 +45,20 @@ public final class SVGImageSticker: VCBaseSticker {
     override public func layoutSubviews() {
         super.layoutSubviews()
         svgLayer.frame = contentView.bounds
+        
+        // Ensure the content layer fills the view
+        if let contentLayer = svgLayer.sublayers?.first {
+            contentLayer.frame = svgLayer.bounds
+        }
     }
 
     // Attach SVG-generated layer
     public func setSVGLayer(_ layer: CALayer) {
         svgLayer.sublayers?.forEach { $0.removeFromSuperlayer() }
         svgLayer.addSublayer(layer)
-        layer.frame = svgLayer.bounds
+        
+        // Don't squash the frame here - let layoutSubviews handle sizing
+        // layer.frame = svgLayer.bounds 
         
         // Store original colors for reset
         storeOriginalColors(in: layer)
