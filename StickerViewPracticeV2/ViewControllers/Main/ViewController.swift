@@ -96,7 +96,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
                 into: stickerView,
                 stickers: &allStickers
             ){ sticker in
-                sticker.borderStyle = .dotted
+                sticker.borderStyle = .solid
                 self.wireStickerCallbacks(sticker)
                 
                 // NOTE: Initial SVG load is NOT registered for undo
@@ -212,6 +212,7 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
                     nodes: nodes
                 ) { [weak self] sticker in
                     self?.wireStickerCallbacks(sticker)
+                    sticker.borderStyle = .solid
                     
                     // Add double-tap for text stickers
                     if sticker is SVGTextSticker || sticker is VCTextViewSticker {

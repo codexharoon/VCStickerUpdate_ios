@@ -104,7 +104,30 @@ public final class SVGTextSticker: VCBaseSticker {
 
     override public func layoutSubviews() {
         super.layoutSubviews()
-        textLayer.frame = contentView.bounds
+        
+        // Disable implicit animations to prevent UI lag/jumping during resize gestures
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        
+        let contentBounds = contentView.bounds
+        let textSize = textLayer.preferredFrameSize()
+        let yOffset = max(0, (contentBounds.height - textSize.height) / 2)
+        
+        textLayer.frame = CGRect(
+             x: 0,
+             y: yOffset,
+             width: contentBounds.width,
+             height: textSize.height
+         )
+        
+        // Fix for blurry text on resize:
+        // Adjust contentsScale based on the view's current transform scale
+        let scale = sqrt(transform.a * transform.a + transform.c * transform.c)
+        // Avoid setting 0 or extremely small scale
+        let safeScale = max(scale, 0.01)
+        textLayer.contentsScale = UIScreen.main.scale * safeScale
+        
+        CATransaction.commit()
     }
 
     // MARK: - Update Methods
@@ -213,7 +236,7 @@ public final class SVGTextSticker: VCBaseSticker {
     // MARK: - Size Adjustment
     
     /// Resize the sticker to fit the current text content
-    public func sizeToFitText(padding: CGFloat = 20, animated: Bool = true) {
+    public func sizeToFitText(padding: CGFloat = 10, animated: Bool = true) {
         let font = SVGPropertyHelper.createFont(
             name: fontName,
             size: fontSize,
