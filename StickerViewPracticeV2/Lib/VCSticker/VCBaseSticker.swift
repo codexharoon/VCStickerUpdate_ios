@@ -105,6 +105,7 @@ open class VCBaseSticker: UIView {
     }()
     
     lazy public var contentView = UIView()
+    lazy public var borderView = UIView() // Hosts the border layer separate from content
     
     override public func layoutSubviews() {
         super.layoutSubviews()
@@ -117,8 +118,8 @@ open class VCBaseSticker: UIView {
             customInit()
         }
         
-        border.path  = UIBezierPath(rect: contentView.bounds).cgPath
-        border.frame = contentView.bounds
+        border.path  = UIBezierPath(rect: borderView.bounds).cgPath
+        border.frame = borderView.bounds
         
         // Apply inverse scale to control buttons so they remain a constant visual size
         let currentScale = sqrt(transform.a * transform.a + transform.c * transform.c)
@@ -173,6 +174,11 @@ open class VCBaseSticker: UIView {
         
         self.addSubview(contentView)
         self.contentView.edgesToSuperview(self.padding)
+        
+        // Add borderView above contentView but with same constraints
+        self.addSubview(borderView)
+        self.borderView.isUserInteractionEnabled = false // Pass touches through
+        self.borderView.edgesToSuperview(self.padding)
         
         if closeBtnEnable {
             self.addSubview(closeBtn)
@@ -231,7 +237,9 @@ open class VCBaseSticker: UIView {
         closeBtn.isHidden  = !closeBtnEnable
         rotateBtn.isHidden = !rotateBtnEnable
         resizeBtnTopRight.isHidden = !resizeTopRightBtnEnable
-        contentView.layer.addSublayer(border)
+        
+        // Add border to borderView instead of contentView
+        borderView.layer.addSublayer(border)
         onBeginEditing?()
     }
     
@@ -249,7 +257,7 @@ open class VCBaseSticker: UIView {
     // MARK: - Preview Snapshot
     
     /// Renders contentView content for layer preview.
-    /// Excludes controls (siblings) and border (hidden via isHidden).
+    /// Excludes controls (siblings) and border (now in borderView).
     /// Does NOT modify sticker state to avoid visual jitter on canvas.
     public func cleanPreviewSnapshot(size: CGSize = CGSize(width: 80, height: 80)) -> UIImage {
         let contentBounds = contentView.bounds
@@ -261,13 +269,10 @@ open class VCBaseSticker: UIView {
         format.scale = UIScreen.main.scale
         format.opaque = false
         
-        // Render contentView.layer directly (excludes sibling controls)
+        // Render contentView.layer directly (excludes sibling controls AND borderView)
         let renderer = UIGraphicsImageRenderer(size: contentBounds.size, format: format)
         let contentImage = renderer.image { context in
-            let borderWasHidden = border.isHidden
-            border.isHidden = true
             contentView.layer.render(in: context.cgContext)
-            border.isHidden = borderWasHidden
         }
         
         guard contentImage.size.width > 0 && contentImage.size.height > 0 else {
