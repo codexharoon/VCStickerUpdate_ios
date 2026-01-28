@@ -23,15 +23,13 @@ final class SVGCanvasLoader {
 
         var newStickers: [VCBaseSticker] = []
 
-        var imageNodeIndex = 0
-        
-        for node in nodes {
+        // Use enumerated index to map directly to the nodes array for restoration
+        for (index, node) in nodes.enumerated() {
             let sticker = SVGStickerFactory.makeSticker(from: node)
             
-            // Track original node index for SVGImageSticker
+            // Track original node index for SVGImageSticker (used for Draft restoration)
             if let imageSticker = sticker as? SVGImageSticker {
-                imageSticker.originalNodeIndex = imageNodeIndex
-                imageNodeIndex += 1
+                imageSticker.originalNodeIndex = index
             }
             
             newStickers.append(sticker)

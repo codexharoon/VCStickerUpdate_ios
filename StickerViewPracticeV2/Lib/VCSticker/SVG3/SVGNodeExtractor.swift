@@ -54,6 +54,19 @@ final class SVGNodeExtractor {
         // SHAPE / IMAGE - Only if it's a shape layer or has image content
         else if layer is CAShapeLayer || layer is CAGradientLayer || layer.contents != nil || layer.mask != nil {
             
+            // VISIBILITY CHECK: Skip leaf shape layers that are strictly invisible
+            if let shape = layer as? CAShapeLayer {
+                let hasFill = shape.fillColor != nil && shape.fillColor!.alpha > 0.01
+                let hasStroke = shape.strokeColor != nil && shape.lineWidth > 0 && shape.strokeColor!.alpha > 0.01
+                let hasSublayers = (shape.sublayers?.count ?? 0) > 0
+                let hasContents = shape.contents != nil
+                
+                // If it has no visual properties and no children, it's a ghost layer intended for masking or hit-testing only
+                if !hasFill && !hasStroke && !hasSublayers && !hasContents {
+                    return
+                }
+            }
+
             // Skip if this is just a container layer
             // Note: Gradient layers and masked layers are content, not just containers
             let isContainer = (layer.sublayers?.count ?? 0) > 0 && 
@@ -72,6 +85,10 @@ final class SVGNodeExtractor {
                     layer: layer
                 )
                 nodes.append(node)
+                
+                // CRITICAL: Once we extract this layer as a node, we treat it as an atomic unit.
+                // Do NOT recurse into its sublayers, otherwise we extract them as duplicate/ghost stickers.
+                return
             }
         }
 

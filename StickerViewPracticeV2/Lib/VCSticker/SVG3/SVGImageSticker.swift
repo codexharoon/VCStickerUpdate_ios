@@ -33,7 +33,8 @@ public final class SVGImageSticker: VCBaseSticker {
     }
     
     // Store original sublayers for color reset
-    private var originalColors: [CALayer: CGColor?] = [:]
+    // Value can be CGColor (for shapes) or [CGColor] (for gradients)
+    private var originalColors: [CALayer: Any?] = [:]
 
     override public func customInit() {
         super.customInit()
@@ -49,6 +50,13 @@ public final class SVGImageSticker: VCBaseSticker {
         // Ensure the content layer fills the view
         if let contentLayer = svgLayer.sublayers?.first {
             contentLayer.frame = svgLayer.bounds
+            
+            // CRITICAL FIX: Masks do not auto-resize with their parent layer.
+            // If the sticker bounds change (e.g. restore from draft), we must resize the mask too
+            // to prevent content from being clipped/broken.
+            if let mask = contentLayer.mask {
+                mask.frame = contentLayer.bounds
+            }
         }
     }
 
@@ -66,7 +74,7 @@ public final class SVGImageSticker: VCBaseSticker {
     
     // MARK: - Color Methods
     
-    /// Apply tint color to all shape layers
+    /// Apply tint color to all layers recursively
     private func applyTintColor() {
         guard let color = shapeTintColor else {
             // Reset to original colors
@@ -77,24 +85,49 @@ public final class SVGImageSticker: VCBaseSticker {
         applyColorRecursively(to: svgLayer, color: color.cgColor)
     }
     
-    /// Apply color to all CAShapeLayer sublayers recursively
+    /// Apply color to all layers recursively
     private func applyColorRecursively(to layer: CALayer, color: CGColor) {
+        
+        // 1. Handle Shape Layers (Standard Fill)
         if let shapeLayer = layer as? CAShapeLayer {
-            // Apply to fill and stroke
             if shapeLayer.fillColor != nil {
                 shapeLayer.fillColor = color
+            } else if shapeLayer.sublayers == nil && layer.mask == nil {
+               // Force fill if it's a leaf shape without fill (often black by default in some SVGs)
+               // Only if it has a path
+               if shapeLayer.path != nil {
+                   shapeLayer.fillColor = color
+               }
             }
         }
         
+        // 2. Handle Gradient Layers (Overwrite gradient with solid tint)
+        if let gradientLayer = layer as? CAGradientLayer {
+            // Create a solid gradient (start and end colors same)
+            gradientLayer.colors = [color, color]
+        }
+        
+        // 3. Recurse
         layer.sublayers?.forEach { sublayer in
             applyColorRecursively(to: sublayer, color: color)
         }
     }
     
-    /// Store original colors of all shape layers
+    /// Store original colors of all layers
     private func storeOriginalColors(in layer: CALayer) {
+        // Store Shape Fill
         if let shapeLayer = layer as? CAShapeLayer {
-            originalColors[shapeLayer] = shapeLayer.fillColor
+            // Only store if not already stored (preserve the very first state)
+            if originalColors[shapeLayer] == nil {
+                originalColors[shapeLayer] = shapeLayer.fillColor
+            }
+        }
+        
+        // Store Gradient Colors
+        if let gradientLayer = layer as? CAGradientLayer {
+            if originalColors[gradientLayer] == nil {
+                originalColors[gradientLayer] = gradientLayer.colors
+            }
         }
         
         layer.sublayers?.forEach { sublayer in
@@ -104,9 +137,17 @@ public final class SVGImageSticker: VCBaseSticker {
     
     /// Reset to original colors
     private func resetColors() {
-        for (layer, originalColor) in originalColors {
+        for (layer, originalValue) in originalColors {
+            
+            // Restore Shape Fill
             if let shapeLayer = layer as? CAShapeLayer {
-                shapeLayer.fillColor = originalColor
+                // We cast explicitly to what we expect
+                shapeLayer.fillColor = (originalValue as! CGColor?)
+            }
+            
+            // Restore Gradient Colors
+            if let gradientLayer = layer as? CAGradientLayer {
+                gradientLayer.colors = (originalValue as! [Any]?)
             }
         }
     }

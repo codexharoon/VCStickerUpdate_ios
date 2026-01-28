@@ -53,8 +53,7 @@ class DraftScreenViewController: UIViewController, UICollectionViewDelegate, UIC
         
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
             DraftManager.shared.deleteDraft(id: draft.id)
-            self.drafts.remove(at: indexPath.item)
-            self.draftCollectionView.deleteItems(at: [indexPath])
+            self.loadDrafts()
         })
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))

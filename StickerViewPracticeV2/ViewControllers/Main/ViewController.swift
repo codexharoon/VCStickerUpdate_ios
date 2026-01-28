@@ -183,7 +183,8 @@ class ViewController: UIViewController, PHPickerViewControllerDelegate {
         
         let renderer = UIGraphicsImageRenderer(size: stickerView.bounds.size, format: format)
         return renderer.image { context in
-            stickerView.layer.render(in: context.cgContext)
+            // Use drawHierarchy for accurate WYSIWYG capture (fixes Gradient layer tint issues)
+            stickerView.drawHierarchy(in: stickerView.bounds, afterScreenUpdates: true)
         }
     }
     
